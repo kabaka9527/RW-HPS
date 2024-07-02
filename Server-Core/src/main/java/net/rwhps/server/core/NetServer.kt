@@ -8,29 +8,13 @@
  */
 package net.rwhps.server.core
 
-import net.rwhps.server.core.thread.CallTimeTask
-import net.rwhps.server.core.thread.Threads.newTimedTask
-import net.rwhps.server.data.global.Data
 import net.rwhps.server.data.global.NetStaticData
 import net.rwhps.server.net.NetService
-import net.rwhps.server.net.manage.HttpRequestManage.doPostRw
-import net.rwhps.server.util.StringFilteringUtil.cutting
-import net.rwhps.server.util.Time.utcMillis
-import net.rwhps.server.util.algorithms.digest.DigestUtils.md5Hex
-import net.rwhps.server.util.algorithms.digest.DigestUtils.sha256
-import net.rwhps.server.util.log.Log.clog
-import net.rwhps.server.util.math.RandomUtils.getRandomString
-import java.math.BigInteger
-import java.util.*
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * @author Dr (dr@der.kim)
  */
 object NetServer {
-    var userId: String? = null
-
     fun closeServer() {
         NetStaticData.netService.eachAll { obj: NetService -> obj.stop() }
     }

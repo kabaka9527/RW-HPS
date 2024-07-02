@@ -15,18 +15,18 @@ import net.rwhps.server.data.global.Data
 import net.rwhps.server.data.global.NetStaticData
 import net.rwhps.server.func.StrCons
 import net.rwhps.server.game.manage.HeadlessModuleManage
+import net.rwhps.server.game.player.PlayerHess
 import net.rwhps.server.net.NetService
 import net.rwhps.server.net.core.IRwHps
 import net.rwhps.server.net.core.server.AbstractNetConnectServer
-import net.rwhps.server.net.manage.HttpRequestManage
 import net.rwhps.server.plugin.Plugin
 import net.rwhps.server.util.IpUtils
-import net.rwhps.server.util.StringFilteringUtil.cutting
 import net.rwhps.server.util.algorithms.Base64
 import net.rwhps.server.util.file.json.Json
 import net.rwhps.server.util.game.command.CommandHandler
-import net.rwhps.server.util.inline.ifNullResult
+import net.rwhps.server.util.inline.ifEmptyResult
 import net.rwhps.server.util.log.Log
+import net.rwhps.server.util.str.StringFilteringUtil.cutting
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -56,6 +56,8 @@ internal class UpListMain: Plugin() {
     private lateinit var updateData: String
     private lateinit var removeData: String
 
+    private var uplistFlag = 0
+
     override fun init() {
         AddLang(this)
     }
@@ -79,8 +81,31 @@ internal class UpListMain: Plugin() {
         }
     }
 
+    override fun registerServerClientCommands(handler: CommandHandler) {
+        handler.register("toup", "#up") { _: Array<String>, player: PlayerHess ->
+            when (uplistFlag) {
+                0 -> {
+                    handler.handleMessage("uplist add")
+                    player.sendSystemMessage("add uplist")
+                    uplistFlag = 1
+                }
+                else -> player.sendSystemMessage("uplisting")
+            }
+        }
+        handler.register("tonp", "#up") { _: Array<String>, player: PlayerHess ->
+            when (uplistFlag) {
+                1 -> {
+                    handler.handleMessage("uplist remove")
+                    player.sendSystemMessage("remove uplist")
+                    uplistFlag = 0
+                }
+                else -> player.sendSystemMessage("no uplist")
+            }
+        }
+    }
+
     private fun initUpListData(urlIn: String = ""): Boolean {
-        if (NetStaticData.ServerNetType.ordinal in IRwHps.NetType.ServerProtocol.ordinal .. IRwHps.NetType.ServerTestProtocol.ordinal) {
+        if (NetStaticData.RwHps.netType.ordinal in IRwHps.NetType.ServerProtocol.ordinal .. IRwHps.NetType.ServerTestProtocol.ordinal) {
             (NetStaticData.RwHps.typeConnect.abstractNetConnect as AbstractNetConnectServer).run {
                 versionBeta = supportedversionBeta
                 versionGame = supportedversionGame
@@ -96,10 +121,10 @@ internal class UpListMain: Plugin() {
 
         val url = urlIn.ifBlank { Data.urlData.readString("Get.Api.UpListData.Bak") }
 
-        var resultUpList = HttpRequestManage.doPost(url, version)
+        var resultUpList = Data.core.http.doPost(url, version)
 
         if (resultUpList.isBlank() && urlIn.isBlank()) {
-            resultUpList = HttpRequestManage.doPost(Data.urlData.readString("Get.Api.UpListData"), version)
+            resultUpList = Data.core.http.doPost(Data.urlData.readString("Get.Api.UpListData"), version)
         }
 
         if (resultUpList.isBlank()) {
@@ -142,7 +167,7 @@ internal class UpListMain: Plugin() {
         if (!upServerList) {
             if (initUpListData()) {
                 this.port = port.ifBlank { Data.config.port.toString() }
-                Threads.newThreadCore { upServerList = true; uplist() }
+                Threads.newThreadCore { upServerList = true; uplistFlag = 1;uplist() }
             }
         } else {
             log("Already on the list")
@@ -167,8 +192,8 @@ internal class UpListMain: Plugin() {
 
         Log.debug(addData0)
 
-        val addGs1 = HttpRequestManage.doPostRw("http://gs1.corrodinggames.com/masterserver/1.4/interface", addData0).contains(serverID)
-        val addGs4 = HttpRequestManage.doPostRw("http://gs4.corrodinggames.net/masterserver/1.4/interface", addData0).contains(serverID)
+        val addGs1 = Data.core.rwHttp.doPost("http://gs1.corrodinggames.com/masterserver/1.4/interface", addData0).contains(serverID)
+        val addGs4 = Data.core.rwHttp.doPost("http://gs4.corrodinggames.net/masterserver/1.4/interface", addData0).contains(serverID)
         if (addGs1 || addGs4) {
             if (addGs1 && addGs4) {
                 Log.clog(Data.i18NBundle.getinput("err.yesList"))
@@ -181,9 +206,9 @@ internal class UpListMain: Plugin() {
 
         val openData0 = openData.replace("{RW-HPS.S.PORT}", port)
 
-        val checkPortGs1 = HttpRequestManage.doPostRw("http://gs1.corrodinggames.com/masterserver/1.4/interface", openData0)
+        val checkPortGs1 = Data.core.rwHttp.doPost("http://gs1.corrodinggames.com/masterserver/1.4/interface", openData0)
             .contains("true")
-        val checkPortGs4 = HttpRequestManage.doPostRw("http://gs4.corrodinggames.net/masterserver/1.4/interface", openData0)
+        val checkPortGs4 = Data.core.rwHttp.doPost("http://gs4.corrodinggames.net/masterserver/1.4/interface", openData0)
             .contains("true")
         if (checkPortGs1 || checkPortGs4) {
             Log.clog(Data.i18NBundle.getinput("err.yesOpen"))
@@ -209,17 +234,18 @@ internal class UpListMain: Plugin() {
         updateData0 = updateData0.replace("{RW-HPS.PLAYER.SIZE.MAX}", Data.configServer.maxPlayer.toString())
 
 
-        HttpRequestManage.doPostRw("http://gs1.corrodinggames.com/masterserver/1.4/interface", updateData0)
-        HttpRequestManage.doPostRw("http://gs4.corrodinggames.net/masterserver/1.4/interface", updateData0)
+        Data.core.rwHttp.doPost("http://gs1.corrodinggames.com/masterserver/1.4/interface", updateData0)
+        Data.core.rwHttp.doPost("http://gs4.corrodinggames.net/masterserver/1.4/interface", updateData0)
     }
 
     private fun remove(log: StrCons) {
         if (upServerList) {
             if (Threads.closeTimeTask(CallTimeTask.CustomUpServerListTask) {
-                    HttpRequestManage.doPostRw("http://gs1.corrodinggames.com/masterserver/1.4/interface", removeData)
-                    HttpRequestManage.doPostRw("http://gs4.corrodinggames.net/masterserver/1.4/interface", removeData)
+                    Data.core.rwHttp.doPost("http://gs1.corrodinggames.com/masterserver/1.4/interface", removeData)
+                    Data.core.rwHttp.doPost("http://gs4.corrodinggames.net/masterserver/1.4/interface", removeData)
                 }) {
                 upServerList = false
+                uplistFlag = 0
                 log("Deleted UPLIST")
                 return
             }
@@ -229,9 +255,9 @@ internal class UpListMain: Plugin() {
         }
     }
 
-    private val isRelay get() = (NetStaticData.ServerNetType == IRwHps.NetType.RelayProtocol || NetStaticData.ServerNetType == IRwHps.NetType.RelayMulticastProtocol)
+    private val isRelay get() = (NetStaticData.RwHps.netType == IRwHps.NetType.RelayProtocol || NetStaticData.RwHps.netType == IRwHps.NetType.RelayMulticastProtocol)
 
-    private val getMapName get() = Data.config.subtitle.ifNullResult({ if (isRelay) "" else HeadlessModuleManage.hps.room.maps.mapName }) { cutting(it, 15) }
+    private val getMapName get() = Data.config.subtitle.ifEmptyResult({ if (isRelay) "" else HeadlessModuleManage.hps.room.maps.mapName }) { cutting(it, 15) }
 
     private val serverPlayerSize get() = AtomicInteger().apply {
         if (isRelay) {

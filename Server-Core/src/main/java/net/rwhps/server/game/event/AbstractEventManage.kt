@@ -27,7 +27,7 @@ import java.lang.reflect.Modifier
  * @date 2023/7/5 14:44
  * @author Dr (dr@der.kim)
  */
-internal abstract class AbstractEventManage(private val eventClass: Class<*>) {
+abstract class AbstractEventManage(private val eventClass: Class<*>) {
     protected val eventData = Events()
     private val eventRunScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

@@ -19,7 +19,6 @@ import net.rwhps.server.net.core.AbstractNet
 import net.rwhps.server.net.core.TypeConnect
 import net.rwhps.server.net.handler.TimeoutDetection
 import net.rwhps.server.util.log.Log
-import net.rwhps.server.util.log.exp.ExceptionX
 import java.net.SocketException
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -90,7 +89,7 @@ open class AcceptorIdleStateTrigger(
             }
             else -> {
                 cause?.let {
-                    Log.error(ExceptionX.resolveTrace(it))
+                    Log.error(it)
                 }
             }
         }

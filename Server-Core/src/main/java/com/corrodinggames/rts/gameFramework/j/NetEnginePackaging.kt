@@ -10,6 +10,7 @@
 package com.corrodinggames.rts.gameFramework.j
 
 import net.rwhps.server.io.packet.Packet
+import net.rwhps.server.net.core.IRwHps
 import net.rwhps.server.plugin.internal.headless.inject.lib.PlayerConnectX
 import com.corrodinggames.rts.gameFramework.j.au as PacketHess
 
@@ -59,7 +60,7 @@ class NetEnginePackaging(private val netEngine: ad, private val playerConnectX: 
      * @return RW-HPS的[PacketHess]
      */
     fun transformPacket(packetHess: PacketHess): Packet {
-        return Packet(packetHess.b, packetHess.c)
+        return Packet(IRwHps.packetType.from(packetHess.b), packetHess.c)
     }
 
     companion object {

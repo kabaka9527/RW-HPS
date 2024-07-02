@@ -8,10 +8,19 @@
  */
 package net.rwhps.server.util.file.plugin
 
+import net.rwhps.server.core.thread.Threads
+import net.rwhps.server.util.file.FileUtils
 import net.rwhps.server.util.file.plugin.serializer.AbstractSerializers
 
 /**
  * @author Dr (dr@der.kim)
  */
-@Suppress("EXPOSED_SUPER_CLASS")
-open class AutoSavePluginData(serializers: AbstractSerializers): AbstractSerializableData(serializers)
+open class AutoSavePluginData(serializers: AbstractSerializers): AbstractSerializableData(serializers) {
+    override fun setFileUtil(fileUtils: FileUtils, autoSave: Boolean) {
+        super.setFileUtil(fileUtils, autoSave)
+        // Exit auto save
+        if (autoSave) {
+            Threads.dataAutoSave.add(this::save)
+        }
+    }
+}

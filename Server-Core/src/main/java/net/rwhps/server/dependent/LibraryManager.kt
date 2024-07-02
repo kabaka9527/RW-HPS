@@ -14,7 +14,7 @@ import net.rwhps.server.data.global.Data
 import net.rwhps.server.func.Control.ControlFind
 import net.rwhps.server.io.input.DisableSyncByteArrayInputStream
 import net.rwhps.server.net.manage.DownloadManage
-import net.rwhps.server.net.manage.HttpRequestProManage
+import net.rwhps.server.net.manage.HttpRequestManage
 import net.rwhps.server.struct.list.Seq
 import net.rwhps.server.struct.map.ObjectMap
 import net.rwhps.server.util.algorithms.digest.DigestUtils
@@ -408,7 +408,7 @@ class LibraryManager(china: Boolean = Data.serverCountry == "CN"): AgentAttachDa
         /** 依赖Pom缓存 */
         private val pomCache: ObjectMap<String, String>
 
-        private val httpManager = HttpRequestProManage(
+        private val httpManager = HttpRequestManage(
             OkHttpClient.Builder().also { builder ->
                 builder.retryOnConnectionFailure(true)
                 builder.connectTimeout(3, TimeUnit.SECONDS)
@@ -444,8 +444,7 @@ class LibraryManager(china: Boolean = Data.serverCountry == "CN"): AgentAttachDa
             pomCache = pomCacheBin.get("pomCache", ObjectMap())
 
             Threads.addSavePool {
-                pomCacheBin.set("pomCache", pomCache)
-                pomCacheBin.save()
+                pomCacheBin["pomCache"] = pomCache
 
                 FileUtils.getFolder(Data.ServerLibPath).fileListNotNullSize.eachAll {
                     if (it.name.endsWith("jar") && !loadEnd.contains(it)) {

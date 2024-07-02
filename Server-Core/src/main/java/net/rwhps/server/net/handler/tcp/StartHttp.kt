@@ -22,6 +22,7 @@ import io.netty.handler.timeout.IdleStateHandler
 import io.netty.util.CharsetUtil
 import net.rwhps.server.data.global.Data
 import net.rwhps.server.net.core.AbstractNet
+import net.rwhps.server.net.core.IRwHps
 import net.rwhps.server.net.core.web.AbstractNetWeb
 import net.rwhps.server.net.http.SendWeb
 import net.rwhps.server.net.http.WebData
@@ -38,7 +39,7 @@ import javax.net.ssl.SSLEngine
  * @author Dr (dr@der.kim)
  */
 @ChannelHandler.Sharable
-open class StartHttp: AbstractNet(), AbstractNetWeb {
+open class StartHttp(rwHps: IRwHps): AbstractNet(rwHps), AbstractNetWeb {
     private var sslContext: SSLContext? = null
     private lateinit var webData: WebData
 

@@ -26,5 +26,4 @@ package net.rwhps.server.util.annotations.mark
         AnnotationTarget.FUNCTION,
         AnnotationTarget.EXPRESSION, AnnotationTarget.PROPERTY
 )
-@Suppress("UNINITIALIZED_VARIABLE")
 annotation class PrivateMark

@@ -36,7 +36,7 @@ class HessMain: Plugin() {
             Data.startServer = true
 
             // Start Hess Core
-            val load = GameModularReusableLoadClass(
+            var load = GameModularReusableLoadClass(
                     Thread.currentThread().contextClassLoader, Thread.currentThread().contextClassLoader.parent
             )
             GameStartInit.init(load)
@@ -44,6 +44,15 @@ class HessMain: Plugin() {
             // 设置 RW-HPS 主要使用的 Hess
             HeadlessModuleManage.hpsLoader = load.toString()
             GameStartInit.start(load)
+
+//             load = GameModularReusableLoadClass(
+//                    Thread.currentThread().contextClassLoader, Thread.currentThread().contextClassLoader.parent
+//            )
+//            GameStartInit.init(load)
+//            Log.clog(Data.i18NBundle.getinput("server.load.headless"))
+//            // 设置 RW-HPS 主要使用的 Hess
+//            HeadlessModuleManage.hpsLoader = load.toString()
+//            GameStartInit.start(load)
 
             Log.set(Data.config.log.uppercase(Locale.getDefault()))
         }

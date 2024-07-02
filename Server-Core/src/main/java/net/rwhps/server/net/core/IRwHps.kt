@@ -9,8 +9,11 @@
 
 package net.rwhps.server.net.core
 
+import net.rwhps.server.core.ServiceLoader
+import net.rwhps.server.core.ServiceLoader.ServiceType
 import net.rwhps.server.io.packet.type.AbstractPacketType
 import net.rwhps.server.net.core.server.packet.AbstractNetPacket
+import net.rwhps.server.util.EnumUtils
 
 /**
  * RW-HPS Protocol 接口. 是 RW-HPS 协议实现的接口.
@@ -56,8 +59,10 @@ import net.rwhps.server.net.core.server.packet.AbstractNetPacket
  * )
  * ```
  *
+ * 请注意, 如果协议类父类被 @DependsClassLoader 标识, 那么ServiceLoader会将注册类绑定到对应的类加载器
+ *
  * ## 实例化 `IRwHps`
- * `IRwHps` 主要在 [net.rwhps.server.data.global.NetStaticData] 中被实例化
+ * `IRwHps` 主要在 [net.rwhps.server.game.manage.IRwHpsManage] 中被实例化
  *
  * 默认通过 [net.rwhps.server.core.ServiceLoader] 使用参数 `(ServiceType.IRwHps, ServerNetType.name, IRwHps.NetType::class.java)` 来完成
  *
@@ -70,7 +75,7 @@ import net.rwhps.server.net.core.server.packet.AbstractNetPacket
  * // RW-HPS
  * override val typeConnect: TypeConnect =
  *         try {
- *             val protocolClass = ServiceLoader.getServiceClass(ServiceType.Protocol,netType.name)
+ *             val protocolClass = ServiceLoader.getServiceClass(this::class.java.classloader, ServiceType.Protocol,netType.name)
  *             ServiceLoader.getService(ServiceType.ProtocolType,netType.name,Class::class.java).newInstance(protocolClass) as TypeConnect
  *         } catch (e: Exception) {
  *             Log.fatal(e)
@@ -90,6 +95,11 @@ import net.rwhps.server.net.core.server.packet.AbstractNetPacket
  */
 interface IRwHps {
     /**
+     * 当前 IRW-HPS 使用的协议
+     */
+    val netType: NetType
+
+    /**
      * 服务器的协议
      * 主要提供 包的解析 功能
      */
@@ -98,11 +108,21 @@ interface IRwHps {
     /**
      * 服务器Packet协议
      * 作为游戏功能的主要实现
+     *
+     * 部分协议不需要使用它, 所以我们使用懒加载 (屎山)
      */
     val abstractNetPacket: AbstractNetPacket
 
-    /** 包类型解析器 */
-    val packetType: AbstractPacketType
+    companion object {
+        /**
+         * 全局使用
+         *
+         * 包类型解析器
+         * */
+        val packetType: AbstractPacketType by lazy {
+            ServiceLoader.getServiceObject(ServiceType.PacketType, IRwHps.NetType.GlobalProtocol.name) as AbstractPacketType
+        }
+    }
 
     enum class NetType {
         /** (默认) Server协议 原汁原味服务器实现 */
@@ -122,13 +142,19 @@ interface IRwHps {
 
         /** 专用后端 */
         DedicatedToTheBackend,
+        /** HTTP Service */
+        HttpProtocol,
+        /** RemoteControl (RCON) Service */
+        RemoteControlProtocol,
         /** 全局使用 */
         GlobalProtocol,
+        /** 非公开使用*/
+        GameProtocol,
         /** 无实现 找不到对应实现 */
         NullProtocol;
 
         companion object {
-            fun from(type: String?): NetType = values().find { it.name == type } ?: NullProtocol
+            fun from(type: String): NetType = EnumUtils.from(entries, type, NullProtocol)!!
         }
     }
 }

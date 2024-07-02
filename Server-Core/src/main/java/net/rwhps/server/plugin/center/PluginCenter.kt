@@ -12,7 +12,6 @@ package net.rwhps.server.plugin.center
 import net.rwhps.server.data.global.Data
 import net.rwhps.server.func.StrCons
 import net.rwhps.server.net.manage.DownloadManage
-import net.rwhps.server.net.manage.HttpRequestManage
 import net.rwhps.server.plugin.GetVersion
 import net.rwhps.server.struct.list.Seq
 import net.rwhps.server.util.annotations.NeedToRefactor
@@ -94,7 +93,7 @@ class PluginCenter {
         }
 
         init {
-            pluginCenterData = Json(HttpRequestManage.doGet(url)).getArraySeqData("result")
+            pluginCenterData = Json(Data.core.http.doGet(url)).getArraySeqData("result")
         }
     }
 

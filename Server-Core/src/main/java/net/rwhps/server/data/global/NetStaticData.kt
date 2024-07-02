@@ -9,15 +9,14 @@
 
 package net.rwhps.server.data.global
 
-import net.rwhps.server.core.ServiceLoader
+import net.rwhps.server.game.manage.IRwHpsManage
 import net.rwhps.server.game.room.RelayRoom
 import net.rwhps.server.net.GroupNet
 import net.rwhps.server.net.NetService
 import net.rwhps.server.net.core.IRwHps
+import net.rwhps.server.net.netconnectprotocol.FakeRwHps
 import net.rwhps.server.struct.list.Seq
 import net.rwhps.server.util.alone.BlackList
-import net.rwhps.server.util.log.exp.ImplementedException
-
 /**
  * @author Dr (dr@der.kim)
  */
@@ -35,40 +34,27 @@ object NetStaticData {
     @JvmField
     val blackList = BlackList()
 
-    var ServerNetType: IRwHps.NetType = IRwHps.NetType.NullProtocol
-        set(value) {
-            field = value
-            if (value != IRwHps.NetType.NullProtocol) {/* 设置协议后会自动初始化IRwHps */
-                RwHps = try {
-                    // 默认用对应协议
-                    ServiceLoader.getService(ServiceLoader.ServiceType.IRwHps, value.name, IRwHps.NetType::class.java)
-                        .newInstance(value) as IRwHps
-                } catch (e: ImplementedException) {
-                    // 找不到就使用全局默认
-                    ServiceLoader.getService(ServiceLoader.ServiceType.IRwHps, "IRwHps", IRwHps.NetType::class.java)
-                        .newInstance(value) as IRwHps
-                }
-            }
-        }
-
-    lateinit var RwHps: IRwHps
-
     @JvmField
     var netService = Seq<NetService>(4)
 
-    @JvmStatic
-    fun checkServerStartNet(run: (() -> Unit)?): Boolean {
-        if (this::RwHps.isInitialized) {
-            run?.let { it() }
-            return true
-        }
-        return false
+    val RwHps: IRwHps by lazy {
+        IRwHpsManage.firstServer ?:FakeRwHps(this::class.java.classLoader, IRwHps.NetType.NullProtocol)
     }
 
     @JvmStatic
-    fun checkProtocolIsServer(): Boolean {
-        return when (ServerNetType) {
+    fun checkServerStartNet(run: (() -> Unit)?): Boolean {
+        if (this::RwHps is FakeRwHps) {
+            return false
+        }
+        run?.let { it() }
+        return true
+    }
+
+    @JvmStatic
+    fun checkProtocolIsServer(serverNetType: IRwHps.NetType): Boolean {
+        return when (serverNetType) {
             IRwHps.NetType.ServerProtocol, IRwHps.NetType.ServerProtocolOld, IRwHps.NetType.ServerTestProtocol -> true
+            IRwHps.NetType.RelayProtocol, IRwHps.NetType.RelayMulticastProtocol -> true
             else -> false
         }
     }

@@ -9,12 +9,13 @@
 
 package net.rwhps.server.net.manage
 
+import net.rwhps.server.data.global.Data
 import net.rwhps.server.util.algorithms.digest.DigestAlgorithm
 import net.rwhps.server.util.algorithms.digest.Digester
 import net.rwhps.server.util.file.FileUtils
 import net.rwhps.server.util.io.IoRead
 import net.rwhps.server.util.log.Log
-import net.rwhps.server.util.log.ProgressBar
+import net.rwhps.server.util.log.ex.ProgressBar
 import net.rwhps.server.util.log.exp.NetException
 import okhttp3.*
 import java.io.FileNotFoundException
@@ -41,7 +42,7 @@ object DownloadManage {
 
         val request: Request = Request.Builder()
             .url(downloadData.fileURL)
-            .addHeader("User-Agent", HttpRequestManage.USER_AGENT)
+            .addHeader("User-Agent", Data.userAgent)
             .build()
 
         try {

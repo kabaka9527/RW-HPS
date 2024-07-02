@@ -15,7 +15,6 @@ import com.corrodinggames.rts.gameFramework.w
 import net.rwhps.server.core.thread.CallTimeTask
 import net.rwhps.server.core.thread.Threads
 import net.rwhps.server.data.global.Data
-import net.rwhps.server.data.global.NetStaticData
 import net.rwhps.server.data.totalizer.TimeAndNumber
 import net.rwhps.server.func.Control
 import net.rwhps.server.game.enums.GameCommandActions
@@ -25,6 +24,7 @@ import net.rwhps.server.game.event.game.PlayerLeaveEvent
 import net.rwhps.server.game.event.game.PlayerOperationFactoryBuildUnitEvent
 import net.rwhps.server.game.event.game.PlayerOperationUnitEvent
 import net.rwhps.server.game.player.PlayerHess
+import net.rwhps.server.game.room.ServerRoom
 import net.rwhps.server.io.GameInputStream
 import net.rwhps.server.io.GameOutputStream
 import net.rwhps.server.io.output.CompressOutputStream
@@ -73,6 +73,8 @@ open class GameVersionServer(val playerConnectX: PlayerConnectX): AbstractNetCon
     override val supportedversionGame = "1.15"
     override val supportedVersionInt = 176
 
+    override val room: ServerRoom = playerConnectX.room
+
     override val name: String get() = player.name
     override val registerPlayerId: String? get() = player.connectHexID
 
@@ -91,7 +93,7 @@ open class GameVersionServer(val playerConnectX: PlayerConnectX): AbstractNetCon
 
     override fun sendSystemMessage(msg: String) {
         try {
-            sendPacket(NetStaticData.RwHps.abstractNetPacket.getSystemMessagePacket(msg))
+            sendPacket(rwHps.abstractNetPacket.getSystemMessagePacket(msg))
         } catch (e: IOException) {
             Log.error("[Player] Send System Chat Error", e)
         }
@@ -99,7 +101,7 @@ open class GameVersionServer(val playerConnectX: PlayerConnectX): AbstractNetCon
 
     override fun sendChatMessage(msg: String, sendBy: String, team: Int) {
         try {
-            sendPacket(NetStaticData.RwHps.abstractNetPacket.getChatMessagePacket(msg, sendBy, team))
+            sendPacket(rwHps.abstractNetPacket.getChatMessagePacket(msg, sendBy, team))
         } catch (e: IOException) {
             Log.error("[Player] Send Player Chat Error", e)
         }
@@ -170,7 +172,7 @@ open class GameVersionServer(val playerConnectX: PlayerConnectX): AbstractNetCon
         val o = GameOutputStream()
         o.writeString(reason)
         sendPacket(o.createPacket(PacketType.KICK))
-        Thread.sleep(100)
+        Thread.sleep(1000)
         disconnect()
     }
 
@@ -207,15 +209,20 @@ open class GameVersionServer(val playerConnectX: PlayerConnectX): AbstractNetCon
                 }
             }
 
-            Log.clog("[&by {0} &fr]: &y{1}", player.name, ColorCodes.formatColors(message, true))
-
             if (response == null || response.type == CommandHandler.ResponseType.noCommand) {
                 if (message.length > Data.configServer.maxMessageLen) {
                     sendSystemMessage(Data.i18NBundle.getinput("message.maxLen"))
                     packet.status = Control.EventNext.STOPPED
                     return
                 }
-                val messageOut = Data.core.admin.filterMessage(player, message) ?:return
+                if (room.muteAll) {
+                    Control.EventNext.STOPPED
+                    return
+                }
+                val messageOut = Data.core.admin.filterMessage(player, message) ?: run {
+                    Control.EventNext.STOPPED
+                    return
+                }
                 GameEngine.data.eventManage.fire(PlayerChatEvent(GameEngine.data, player, messageOut))
             } else if (response.type != CommandHandler.ResponseType.valid) {
                 when (response.type) {
@@ -234,6 +241,8 @@ open class GameVersionServer(val playerConnectX: PlayerConnectX): AbstractNetCon
             } else {
                 packet.status = Control.EventNext.STOPPED
             }
+
+            Log.clog("[&by {0} &fr]: &y{1}", player.name, ColorCodes.formatColors(message, true))
         }
     }
 
@@ -308,14 +317,14 @@ open class GameVersionServer(val playerConnectX: PlayerConnectX): AbstractNetCon
 //
 //            val out = GameOutputStream()
 //            out.flushEncodeData(CompressOutputStream.getGzipOutputStream("c", false).apply {
-//                writeBytes(NetStaticData.RwHps.abstractNetPacket.gameSummonPacket(player.index, unit, x, y).bytes)
+//                writeBytes(rwHps.abstractNetPacket.gameSummonPacket(player.index, unit, x, y).bytes)
 //            })
 //
 //            commandPacket.a(GameNetInputStream(playerConnectX.netEnginePackaging.transformHessPacket(out.createPacket(PacketType.TICK))))
 //
 //            commandPacket.c = GameEngine.data.gameHessData.tickNetHess + 10
 //            GameEngine.gameEngine.cf.b.add(commandPacket)
-            GameEngine.data.gameData.commandPacketList.add(NetStaticData.RwHps.abstractNetPacket.gameSummonPacket(player.index, unit, x, y).bytes)
+            GameEngine.data.gameData.commandPacketList.add(rwHps.abstractNetPacket.gameSummonPacket(player.index, unit, x, y).bytes)
         } catch (e: Exception) {
             Log.error(e)
         }

@@ -31,7 +31,7 @@ interface AbstractNetConnectRelay {
      * Get the instance of Relay, null if none
      * @return Relay
      */
-    val relayRoom: RelayRoom?
+    val room: RelayRoom?
 
     fun setCachePacket(packet: Packet)
 

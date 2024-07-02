@@ -14,6 +14,8 @@ import net.rwhps.server.net.core.TypeConnect
 import net.rwhps.server.net.core.server.AbstractNetConnect
 import net.rwhps.server.net.core.server.packet.AbstractNetPacket
 import net.rwhps.server.util.ReflectionUtils
+import net.rwhps.server.util.annotations.core.DependsClassLoader
+import net.rwhps.server.util.inline.ifNullResult
 import net.rwhps.server.util.log.exp.ImplementedException
 import net.rwhps.server.util.log.exp.VariableException
 import java.lang.reflect.Constructor
@@ -32,8 +34,6 @@ import java.lang.reflect.Constructor
  */
 object ServiceLoader {
     private val ServiceLoaderData: MutableMap<String, Class<*>> = HashMap()
-    private val ServiceCustomLoaderData: MutableMap<String, String> = HashMap()
-
     private val ServiceObjectData: MutableMap<String, Any> = HashMap()
 
     /**
@@ -44,9 +44,48 @@ object ServiceLoader {
      * @return Constructor<*>                    : Constructor
      */
     fun getService(serviceType: ServiceType, serviceName: String, vararg parameterTypes: Class<*>): Constructor<*> {
-        val serviceClass = ServiceLoaderData[serviceType.name + serviceName]
+        return getService(null, serviceType, serviceName, *parameterTypes)
+    }
+
+    /**
+     * Get service instance
+     *
+     * @param classLoader ClassLoader            : ClassLoader
+     * @param serviceType ServiceType            : Service type
+     * @param serviceName String                 : Name
+     * @param parameterTypes Array<out Class<*>> : Construction Parameters
+     * @return Constructor<*>                    : Constructor
+     */
+    fun getService(classLoader: ClassLoader?, serviceType: ServiceType, serviceName: String, vararg parameterTypes: Class<*>): Constructor<*> {
+        val serviceClass = ServiceLoaderData[serviceType.name + serviceName + classLoader.ifNullResult("") { it.name }]
         if (serviceClass != null) {
             return ReflectionUtils.accessibleConstructor(serviceClass, *parameterTypes)
+        } else {
+            throw ImplementedException("${serviceType.name}:$serviceName")
+        }
+    }
+
+
+    /**
+     * 获取服务 Class
+     * @param serviceType ServiceType : 服务类型
+     * @param serviceName String      : 名称
+     * @return Class<*>               : Class
+     */
+    fun getServiceClass(serviceType: ServiceType, serviceName: String): Class<*> {
+        return getServiceClass(null, serviceType, serviceName)
+    }
+
+    /**
+     * 获取服务 Class
+     * @param serviceType ServiceType : 服务类型
+     * @param serviceName String      : 名称
+     * @return Class<*>               : Class
+     */
+    fun getServiceClass(classLoader: ClassLoader?, serviceType: ServiceType, serviceName: String): Class<*> {
+        val serviceClass = ServiceLoaderData[serviceType.name + serviceName + classLoader.ifNullResult("") { it.name }]
+        if (serviceClass != null) {
+            return serviceClass
         } else {
             throw ImplementedException("${serviceType.name}:$serviceName")
         }
@@ -58,8 +97,8 @@ object ServiceLoader {
      * @param serviceName String      : 名称
      * @return Class<*>               : Class
      */
-    fun getServiceClass(serviceType: ServiceType, serviceName: String): Class<*> {
-        val serviceClass = ServiceLoaderData[serviceType.name + serviceName]
+    fun getServiceObject(serviceType: ServiceType, serviceName: String): Any {
+        val serviceClass = ServiceObjectData[serviceType.name + serviceName]
         if (serviceClass != null) {
             return serviceClass
         } else {
@@ -81,26 +120,18 @@ object ServiceLoader {
         if (ReflectionUtils.findSuperClass(serviceClass, serviceType.classType)) {
             throw VariableException.TypeMismatchException("[AddService] ${serviceType.classType} : ${serviceClass.name}")
         }
+        // 如果 [DependsClassLoader] 存在, 那么就绑定到对应类加载器
+        val name = if (serviceType.classType.getAnnotation(DependsClassLoader::class.java) != null) {
+            serviceType.name + serviceName + serviceClass.classLoader.name
+        } else {
+            serviceType.name + serviceName
+        }
         // 跳过已经存在的
-        if (ServiceLoaderData.containsKey(serviceType.name + serviceName) && !cover) {
+        if (ServiceLoaderData.containsKey(name) && !cover) {
             return
         }
-        ServiceLoaderData[serviceType.name + serviceName] = serviceClass
-    }
 
-    /**
-     * 获取服务 Class
-     * @param serviceType ServiceType : 服务类型
-     * @param serviceName String      : 名称
-     * @return Class<*>               : Class
-     */
-    fun getServiceObject(serviceType: ServiceType, serviceName: String): Any {
-        val serviceClass = ServiceObjectData[serviceType.name + serviceName]
-        if (serviceClass != null) {
-            return serviceClass
-        } else {
-            throw ImplementedException("${serviceType.name}:$serviceName")
-        }
+        ServiceLoaderData[name] = serviceClass
     }
 
     /**

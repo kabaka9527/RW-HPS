@@ -10,7 +10,7 @@
 package net.rwhps.server.io.input
 
 import net.rwhps.server.io.GameInputStream
-import net.rwhps.server.util.compression.gzip.GzipDecoder
+import net.rwhps.server.util.compression.decoder.GzipDecoder
 
 /**
  * 提供压缩流支持

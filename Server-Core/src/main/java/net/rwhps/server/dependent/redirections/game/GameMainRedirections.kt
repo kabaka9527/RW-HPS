@@ -57,6 +57,7 @@ class GameMainRedirections: MainRedirections {
         addAllReplace("org/newdawn/slick/util/DefaultLogSystem")
         addAllReplace("com/LibRocket")
         addAllReplace("com/corrodinggames/librocket/scripts/ScriptEngine")
+
         // 这两个 因为 [LibRocket] 如果是空的话, 会被……游戏调用导致 NPE, 所以我们要覆盖掉方法
         // 需要空实现
         redirectR(MethodTypeInfoValue("com/corrodinggames/librocket/b", "closeDocument", "(Lcom/ElementDocument;)V"))
@@ -134,9 +135,9 @@ class GameMainRedirections: MainRedirections {
         // 保存Replay时触发
         @GameSimulationLayer.GameSimulationLayer_KeyWords("Recording replay to:")
         redirectL(MethodTypeInfoValue("com/corrodinggames/rts/gameFramework/ba", "d", "(Ljava/lang/String;)V", true)) { obj: Any?, _: String, args: Array<out Any?> ->
-            Log.clog("Save Replay to: {0}", args[0].also { replayFileName ->
+            Log.clog("Save Replay to: {}", args[0].also { replayFileName ->
                 HeadlessModuleManage.hessLoaderMap[obj!!::class.java.classLoader.toString()]!!.room.replayFileName = replayFileName.toString()
-            })
+            }!!)
         }
     }
 }

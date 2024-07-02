@@ -10,7 +10,6 @@
 package net.rwhps.server.command
 
 import net.rwhps.server.command.relay.RelayCommands
-import net.rwhps.server.core.Core
 import net.rwhps.server.core.Initialization
 import net.rwhps.server.core.NetServer
 import net.rwhps.server.core.thread.Threads
@@ -21,12 +20,11 @@ import net.rwhps.server.dependent.HotLoadClass
 import net.rwhps.server.func.StrCons
 import net.rwhps.server.game.event.global.ServerStartTypeEvent
 import net.rwhps.server.game.manage.HeadlessModuleManage
+import net.rwhps.server.game.manage.IRwHpsManage
 import net.rwhps.server.io.output.DisableSyncByteArrayOutputStream
 import net.rwhps.server.net.NetService
-import net.rwhps.server.net.core.AbstractNet
 import net.rwhps.server.net.core.IRwHps
 import net.rwhps.server.net.manage.DownloadManage
-import net.rwhps.server.net.manage.HttpRequestManage
 import net.rwhps.server.plugin.GetVersion
 import net.rwhps.server.plugin.PluginLoadData
 import net.rwhps.server.plugin.center.PluginCenter
@@ -34,6 +32,7 @@ import net.rwhps.server.struct.list.Seq
 import net.rwhps.server.util.SystemUtils
 import net.rwhps.server.util.alone.DiffUpdate
 import net.rwhps.server.util.annotations.NeedHelp
+import net.rwhps.server.util.console.tab.TabDefaultEnum
 import net.rwhps.server.util.file.FileUtils
 import net.rwhps.server.util.file.plugin.PluginManage
 import net.rwhps.server.util.game.command.CommandHandler
@@ -83,33 +82,33 @@ class CoreCommands(handler: CommandHandler) {
                             "status.versionS",
                             SystemUtils.javaHeap / 1024 / 1024,
                             Data.SERVER_CORE_VERSION,
-                            NetStaticData.ServerNetType.name
+                            NetStaticData.RwHps.netType.name
                     )
             )
-            if (NetStaticData.ServerNetType.ordinal in IRwHps.NetType.ServerProtocol.ordinal .. IRwHps.NetType.ServerTestProtocol.ordinal) {
+            if (NetStaticData.RwHps.netType.ordinal in IRwHps.NetType.ServerProtocol.ordinal .. IRwHps.NetType.ServerTestProtocol.ordinal) {
                 HeadlessModuleManage.hessLoaderMap.values.forEach {
                     log(
                             localeUtil.getinput(
                                     "status.versionS.server",
                                     it.room.maps.mapName,
                                     it.room.playerManage.playerAll.size,
-                                    NetStaticData.ServerNetType.name,
+                                    NetStaticData.RwHps.netType.name,
                                     it.useClassLoader,
                                     it.room.roomID
                             )
                     )
                 }
-            } else if (NetStaticData.ServerNetType == IRwHps.NetType.RelayProtocol || NetStaticData.ServerNetType == IRwHps.NetType.RelayMulticastProtocol) {
+            } else if (NetStaticData.RwHps.netType == IRwHps.NetType.RelayProtocol || NetStaticData.RwHps.netType == IRwHps.NetType.RelayMulticastProtocol) {
                 val size = AtomicInteger()
                 NetStaticData.netService.eachAll { e: NetService -> size.addAndGet(e.getConnectSize()) }
                 log(localeUtil.getinput("status.versionS.relay", size.get()))
             }
         }
-        handler.register("setlanguage", "[HK/CN/RU/EN]", "serverCommands.setlanguage") { arg: Array<String>, _: StrCons ->
+        handler.register("setlanguage", "<${TabDefaultEnum.Language}>", "serverCommands.setlanguage") { arg: Array<String>, _: StrCons ->
             Initialization.initServerLanguage(Data.core.settings, arg[0])
         }
 
-        handler.register("exit", "serverCommands.exit") { Core.exit() }
+        handler.register("exit", "serverCommands.exit") { Data.core.exit() }
     }
 
     private fun registerInfo(handler: CommandHandler) {
@@ -127,7 +126,7 @@ class CoreCommands(handler: CommandHandler) {
 
         handler.register("tryupdate", "serverCommands.tryUpdate") { _: Array<String>, log: StrCons ->
             val jsonAll = Array<BeanGithubReleasesApi>::class.java.toGson(
-                    HttpRequestManage.doGet(Data.urlData.readString("Get.Core.Update.AllVersion"))
+                    Data.core.http.doGet(Data.urlData.readString("Get.Core.Update.AllVersion"))
             )
             val nowVersion = GetVersion(Data.SERVER_CORE_VERSION)
 
@@ -155,7 +154,7 @@ class CoreCommands(handler: CommandHandler) {
                     old = new.toByteArray()
                 }
 
-                Core.exit() {
+                Data.core.exit {
                     Log.clog("Use ctrl+c")
                     FileUtils(FileUtils.getMyFilePath()).writeFileByte(old)
                 }
@@ -213,9 +212,7 @@ class CoreCommands(handler: CommandHandler) {
 
             Log.set(Data.config.log.uppercase(Locale.getDefault()))
 
-            NetStaticData.ServerNetType = IRwHps.NetType.RelayProtocol
-
-            handler.handleMessage("startnetservice ${NetService.coreID()} true 5201 5500") //5200 6500
+            handler.handleMessage("startnetservice ${NetService.coreID()} true 5201 5500", IRwHpsManage.addIRwHps(IRwHps.NetType.RelayProtocol)) //5200 6500
         }
         handler.register("startrelaytest", "serverCommands.start") { _: Array<String>?, log: StrCons ->
             if (NetStaticData.netService.size > 0) {
@@ -228,23 +225,17 @@ class CoreCommands(handler: CommandHandler) {
 
             Log.set(Data.config.log.uppercase(Locale.getDefault()))
 
-            NetStaticData.ServerNetType = IRwHps.NetType.RelayMulticastProtocol
-
-            handler.handleMessage("startnetservice ${NetService.coreID()} true 7000 8000")
+            handler.handleMessage("startnetservice ${NetService.coreID()} true 7000 8000", IRwHpsManage.addIRwHps(IRwHps.NetType.RelayMulticastProtocol))
         }
 
 
-        handler.register("startnetservice", "<id> <isPort> [sPort] [ePort]", "HIDE") { arg: Array<String>?, net: AbstractNet? ->
+        handler.register("startnetservice", "<id> <isPort> [sPort] [ePort]", "HIDE") { arg: Array<String>?, net: IRwHps ->
             if (arg != null) {
                 if (arg[1].toBoolean()) {
 
-                    val netServiceTcp = if (net == null) {
-                        NetService(arg[0])
-                    } else {
-                        NetService(arg[0], net)
-                    }
+                    val netServiceTcp = NetService(arg[0], net)
 
-                    if (NetStaticData.ServerNetType == IRwHps.NetType.RelayProtocol || NetStaticData.ServerNetType == IRwHps.NetType.RelayMulticastProtocol) {
+                    if (net.netType == IRwHps.NetType.RelayProtocol || net.netType == IRwHps.NetType.RelayMulticastProtocol) {
                         netServiceTcp.workThreadCount = 3000
                     } else {
                         // 用户 CPU 并没有那么强悍
@@ -260,7 +251,7 @@ class CoreCommands(handler: CommandHandler) {
                     }
                 }
 
-                PluginManage.runGlobalEventManage(ServerStartTypeEvent(NetStaticData.ServerNetType))
+                PluginManage.runGlobalEventManage(ServerStartTypeEvent(net.netType))
             } else {
                 Log.clog("[Start Service] No parameter")
             }

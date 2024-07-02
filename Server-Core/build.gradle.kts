@@ -12,7 +12,7 @@
  */
 dependencies {
     api("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlinVersion}")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 
     implementation(project(":TimeTaskQuartz"))
     implementation(project(":ASM-Framework"))
@@ -35,8 +35,8 @@ dependencies {
 
     // Json 解析
     // 我建议使用 RW-HPS Json 方法 而不是直接使用依赖
-    api("com.google.code.gson:gson:2.10.1")
-    api("org.json:json:20231013")
+    api("com.google.code.gson:gson:2.10")
+    api("org.json:json:20240303")
 
     implementation("org.apache.commons:commons-compress:1.26.1")
     implementation("org.tukaani:xz:1.9")
@@ -49,7 +49,8 @@ dependencies {
         exclude("org.json")
     }
 
-    implementation("org.lionsoul:ip2region:1.7.2")
+    //implementation("org.lionsoul:ip2region:1.7.2")
+    implementation("net.renfei:ip2location:1.2.1")
 
     implementation("net.java.dev.jna:jna:5.14.0")
 
@@ -59,7 +60,7 @@ dependencies {
     }
     implementation("org.jline:jline-terminal-jna:${Versions.jLineVersion}")
 
-    implementation("it.unimi.dsi:fastutil-core:8.5.12")
+    implementation("it.unimi.dsi:fastutil-core:8.5.13")
 
     compileOnlyAndTest("org.graalvm.js:js:${Versions.graalvmVersion}")
     compileOnlyAndTest("org.graalvm.sdk:graal-sdk:${Versions.graalvmVersion}")

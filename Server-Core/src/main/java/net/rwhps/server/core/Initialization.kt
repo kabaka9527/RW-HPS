@@ -27,10 +27,16 @@ import net.rwhps.server.net.core.IRwHps
 import net.rwhps.server.net.core.server.AbstractNetConnect
 import net.rwhps.server.net.core.server.AbstractNetConnectServer
 import net.rwhps.server.net.manage.DownloadManage
-import net.rwhps.server.net.manage.HttpRequestManage
-import net.rwhps.server.net.netconnectprotocol.*
-import net.rwhps.server.net.netconnectprotocol.realize.*
-import net.rwhps.server.util.*
+import net.rwhps.server.net.netconnectprotocol.FakeRwHps
+import net.rwhps.server.net.netconnectprotocol.RwHps
+import net.rwhps.server.net.netconnectprotocol.TypeRelay
+import net.rwhps.server.net.netconnectprotocol.TypeRelayRebroadcast
+import net.rwhps.server.net.netconnectprotocol.realize.GameVersionPacket
+import net.rwhps.server.net.netconnectprotocol.realize.GameVersionRelay
+import net.rwhps.server.net.netconnectprotocol.realize.GameVersionRelayRebroadcast
+import net.rwhps.server.util.str.StringUtils
+import net.rwhps.server.util.SystemUtils
+import net.rwhps.server.util.Time
 import net.rwhps.server.util.algorithms.Aes
 import net.rwhps.server.util.algorithms.Rsa
 import net.rwhps.server.util.annotations.mark.PrivateMark
@@ -40,15 +46,12 @@ import net.rwhps.server.util.file.plugin.PluginData
 import net.rwhps.server.util.inline.readBytes
 import net.rwhps.server.util.inline.readFileListString
 import net.rwhps.server.util.inline.toPrettyPrintingJson
-import net.rwhps.server.util.internal.*
 import net.rwhps.server.util.log.Log
+import net.rwhps.server.util.log.ex.PrintEx
 import java.io.DataOutputStream
-import java.io.FilterInputStream
-import java.io.IOException
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
-import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -75,59 +78,6 @@ class Initialization {
         Data.i18NBundle = Data.i18NBundleMap["EN"]!!
     }
 
-    private fun initMaps() {
-        with(Data.MapsMap) {
-            put("Beachlanding(2p)[byhxyy]", "Beach landing (2p) [by hxyy]@[p2]")
-            put("BigIsland(2p)", "Big Island (2p)@[p2]")
-            put("DireStraight(2p)[byuber]", "Dire_Straight (2p) [by uber]@[p2]")
-            put("FireBridge(2p)[byuber]", "Fire Bridge (2p) [by uber]@[p2]")
-            put("Hills(2p)[ByTstis&KPSS]", "Hills_(2p)_[By Tstis & KPSS]@[p2]")
-            put("IceIsland(2p)", "Ice Island (2p)@[p2]")
-            put("Lake(2p)", "Lake (2p)@[p2]")
-            put("SmallIsland(2p)", "Small_Island (2p)@[p2]")
-            put("Twocoldsides(2p)", "Two_cold_sides (2p)@[p2]")
-            put("Hercules(2vs1p)[byuber]", "Hercules_(2vs1p) [by_uber]@[p3]")
-            put("KingoftheMiddle(3p)", "King of the Middle (3p)@[p3]")
-            put("Depthcharges(4p)[byhxyy]", "Depth charges (4p) [by hxyy]@[p4]")
-            put("Desert(4p)", "Desert (4p)@[p4]")
-            put("IceLake(4p)[byhxyy]", "Ice Lake (4p) [by hxyy]@[p4]")
-            put("Islandfreeze(4p)[byhxyy]", "Island freeze (4p) [by hxyy]@[p4]")
-            put("Islands(4p)", "Islands (4p)@[p4]")
-            put("LavaMaze(4p)", "Lava Maze (4p)@[p4]")
-            put("LavaVortex(4p)", "Lava Vortex (4p)@[p4]")
-            put("MagmaIsland(4p)", "Magma Island (4p)@[p4]")
-            put("Manipulation(4p)[ByTstis]", "Manipulation_(4p)_[By Tstis]@[p4]")
-            put("Nuclearwar(4p)[byhxyy]", "Nuclear war (4p) [by hxyy]@[p4]")
-            put("Crossing(6p)", "Crossing (6p)@[p6]")
-            put("ShoretoShore(6p)", "Shore to Shore (6p)@[p6]")
-            put("ValleyPass(6p)", "Valley Pass (6p)@[p6]")
-            put("BridgesOverLava(8p)", "Bridges Over Lava (8p)@[p8]")
-            put("Coastline(8p)[byhxyy]", "Coastline (8p) [by hxyy]@[p8]")
-            put("HugeSubdivide(8p)", "Huge Subdivide (8p)@[p8]")
-            put("Interlocked(8p)", "Interlocked (8p)@[p8]")
-            put("InterlockedLarge(8p)", "Interlocked Large (8p)@[p8]")
-            put("IsleRing(8p)", "Isle Ring (8p)@[p8]")
-            put("LargeIceOutcrop(8p)", "Large Ice Outcrop (8p)@[p8]")
-            put("LavaBiogrid(8p)", "Lava Bio-grid(8p)@[p8]")
-            put("LavaDivide(8p)", "Lava Divide(8p)@[p8]")
-            put("ManyIslands(8p)", "Many Islands (8p)@[p8]")
-            put("RandomIslands(8p)", "Random Islands (8p)@[p8]")
-            put("Tornadoeye(8p)[byhxyy]", "Tornado eye (8p) [by hxyy]@[p8]")
-            put("TwoSides(8p)", "Two Sides (8p)@[p8]")
-            put("Volcano(8p)", "Volcano (8p)@[p8]")
-            put("VolcanoCrater(8p)", "Volcano Crater(8p)@[p8]")
-            put("TwoSidesRemake(10p)", "Two Sides Remake (10p)@[z;p10]")
-            put("ValleyArena(10p)[byuber]", "Valley Arena (10p) [by_uber]@[z;p10]")
-            put("ManyIslandsLarge(10p)", "Many Islands Large (10p)@[z;p10]")
-            put("CrossingLarge(10p)", "Crossing Large (10p)@[z;p10]")
-            put("Kingdoms(10p)[byVulkan]", "Kingdoms (10p) [by Vulkan]@[z;p10]")
-            put("LargeLavaDivide(10p)", "Large Lava Divide (10p)@[z;p10]")
-            put("EnclosedIsland(10p)", "Enclosed Island (10p)@[z;p10]")
-            put("TwoLargeIslands(10p)", "Two_Large_Islands_(10p)@[z;p10]")
-            put("Wetlands(10p)", "Wetlands (10p)@[z;p10]")
-        }
-    }
-
     private fun loadIpBin() {
         if (!Data.config.ipCheckMultiLanguageSupport) {
             return
@@ -151,10 +101,10 @@ class Initialization {
     }
 
     private fun initGetServerData() {
-        Threads.newTimedTask(CallTimeTask.ServerUpStatistics, 0, 1, TimeUnit.MINUTES) {
-            if (NetStaticData.ServerNetType != IRwHps.NetType.NullProtocol) {
+        Threads.newTimedTask(CallTimeTask.ServerUpStatistics, 1, 1, TimeUnit.MINUTES) {
+            if (NetStaticData.RwHps.netType != IRwHps.NetType.NullProtocol) {
                 try {
-                    val data = when (NetStaticData.ServerNetType) {
+                    val data = when (NetStaticData.RwHps.netType) {
                         IRwHps.NetType.ServerProtocol, IRwHps.NetType.ServerProtocolOld, IRwHps.NetType.ServerTestProtocol -> {
                             BaseDataSend(
                                     IsServer = true,
@@ -222,8 +172,8 @@ class Initialization {
          */
         internal fun initServerLanguage(pluginData: PluginData, country: String = "") {
             serverCountry = if (country.isBlank()) {
-                pluginData.get("serverCountry") {
-                    val countryUrl = HttpRequestManage.doGet(Data.urlData.readString("Get.Api.ServerLanguage.Bak"))
+                pluginData["serverCountry", {
+                    val countryUrl = Data.core.http.doGet(Data.urlData.readString("Get.Api.ServerLanguage.Bak"))
 
                     when {
                         countryUrl.contains("香港") -> "HK"
@@ -231,13 +181,13 @@ class Initialization {
                         countryUrl.contains("俄罗斯") -> "RU"
                         else -> "EN"
                     }
-                }
+                }]
             } else {
                 when {
                     country.contains("HK") || country.contains("CN") || country.contains("RU") -> country
                     else -> "EN"
                 }.also {
-                    pluginData.set("serverCountry", it)
+                    pluginData["serverCountry"] = it
                 }
             }
 
@@ -248,38 +198,30 @@ class Initialization {
         private fun eula(pluginData: PluginData) {
             // Eula
             if (pluginData["eulaVersion", ""] != Data.SERVER_EULA_VERSION) {
-                val eulaBytes = if (serverCountry == "CN") {
-                    FileUtils.getInternalFileStream("/eula/Main-China.md").readBytes()
-                } else {
-                    FileUtils.getInternalFileStream("/eula/Main-English.md").readBytes()
-                }
-                Log.clog(StringUtils.str(eulaBytes, Data.UTF_8))
-
-                Log.clog("Agree to enter : Yes , Otherwise please enter : No")
-                Data.privateOut.print("Please Enter (Yes/No) > ")
-
-                Scanner(object: FilterInputStream(System.`in`) {
-                    @Throws(IOException::class)
-                    override fun close() {
-                        //do nothing
+                PrintEx.waitLicense({
+                    val eulaBytes = if (serverCountry == "CN") {
+                        FileUtils.getInternalFileStream("/eula/Main-China.md").readBytes()
+                    } else {
+                        FileUtils.getInternalFileStream("/eula/Main-English.md").readBytes()
                     }
-                }).use {
-                    while (true) {
-                        val text = it.nextLine()
-                        if (text.equals("Yes", ignoreCase = true)) {
-                            pluginData.set("eulaVersion", Data.SERVER_EULA_VERSION)
-                            Log.clog("Thanks !")
-                            return
-                        } else if (text.equals("No", ignoreCase = true)) {
-                            Log.clog("Thanks !")
-                            Core.exit()
-                        } else {
-                            Log.clog("Re Enter")
-                            Data.privateOut.print("Please Enter (Yes/No) > ")
-                        }
-                    }
-                }
+                    Log.clog(StringUtils.str(eulaBytes, Data.UTF_8))
+                }, { pluginData["eulaVersion"] = Data.SERVER_EULA_VERSION }, { Data.core.exit() })
             }
+
+            if (pluginData["initStart", true]) {
+                PrintEx.waitLicense({
+                    val initStart = if (serverCountry == "CN") {
+                        "您看起来是第一次运行服务器, 需要WEB面板帮助您初始化吗"
+                    } else {
+                        "It looks like you are running the server for the first time. Do you need the WEB panel to help you initialize?"
+                    }
+                    Log.clog(initStart)
+                }, {
+                    pluginData["initStart"] = false
+                }, {})
+            }
+
+            pluginData.save()
         }
 
         internal fun loadLib() {
@@ -306,7 +248,6 @@ class Initialization {
             FileUtils.getInternalFileStream("/maven/ASM-Framework/implementation.txt").readFileListString().eachAll(libImport)
             FileUtils.getInternalFileStream("/maven/Server-Core/implementation.txt").readFileListString().eachAll(libImport)
             FileUtils.getInternalFileStream("/maven/TimeTaskQuartz/implementation.txt").readFileListString().eachAll(libImport)
-
 
             val wasm = FileUtils.getFolder(Data.ServerLibPath).toFile("Wasm.jar")
             if (!wasm.exists() && !DownloadManage.addDownloadTask(DownloadManage.DownloadData(Data.urlData.readString("Get.Core.ResDown") + "Wasm.zip", wasm, progressFlag = true))) {
@@ -340,12 +281,14 @@ class Initialization {
             ServiceLoader.addServiceObject(ServiceType.PacketType, IRwHps.NetType.GlobalProtocol.name, PacketType.INSTANCE)
 
             ServiceLoader.addService(ServiceType.IRwHps, "IRwHps", RwHps::class.java)
+            ServiceLoader.addService(ServiceType.IRwHps, IRwHps.NetType.RemoteControlProtocol.name, FakeRwHps::class.java)
+            ServiceLoader.addService(ServiceType.IRwHps, IRwHps.NetType.HttpProtocol.name, FakeRwHps::class.java)
         }
 
         internal data class BaseDataSend(
             val SendTime: Int = Time.concurrentSecond(),
             val ServerRunPort: Int = Data.config.port,
-            val ServerNetType: String = NetStaticData.ServerNetType.name,
+            val ServerNetType: String = NetStaticData.RwHps.netType.name,
             val System: String = SystemUtils.osName,
             val JavaVersion: String = SystemUtils.javaVersion,
             val VersionCount: String = Data.SERVER_CORE_VERSION,
@@ -398,7 +341,6 @@ class Initialization {
         //
         loadLang()
 
-        initMaps()
         //initRsa()
         initGetServerData()
     }

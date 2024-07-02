@@ -10,6 +10,7 @@
 package net.rwhps.server.net.core.server
 
 import net.rwhps.server.game.player.PlayerHess
+import net.rwhps.server.game.room.ServerRoom
 import net.rwhps.server.io.output.CompressOutputStream
 import net.rwhps.server.io.packet.Packet
 import net.rwhps.server.net.core.DataPermissionStatus
@@ -28,6 +29,8 @@ interface AbstractNetConnectServer {
     val supportedversionBeta: Boolean
     val supportedversionGame: String
     val supportedVersionInt: Int
+
+    val room: ServerRoom
 
     /**
      * Acquire players

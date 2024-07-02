@@ -11,7 +11,7 @@ import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.AbstractDokkaTask
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.util.*
@@ -45,21 +45,19 @@ allprojects {
         }
     }
 
-    tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_21.toString()
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
 
     tasks.withType<JavaCompile> {
-        /* 使用Java21做标准语法并编译 */
-        sourceCompatibility = JavaVersion.VERSION_21.toString()
-        targetCompatibility = JavaVersion.VERSION_21.toString()
+        /* 使用Java17做标准语法并编译 */
+        sourceCompatibility = JvmTarget.JVM_11.target
+        targetCompatibility = JvmTarget.JVM_11.target
 
         options.encoding = "UTF-8"
-//        options.compilerArgs.addAll(listOf(
-//            "-Xlint:unchecked", "-Werror",
-//            "-Xdiags:verbose", "-Werror",
-//            "-Xlint:deprecation", "-Werror"
-//        ))
     }
 }
 

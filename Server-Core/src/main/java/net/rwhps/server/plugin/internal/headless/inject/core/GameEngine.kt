@@ -84,6 +84,8 @@ internal object GameEngine {
         mainClass.findField("k", appGameContainerClass)!!.get(mainObject) as RWAppGameContainer
     }
 
+    var iRwHps: IRwHps? = null
+
     /**
      * 通过这里完成 [AbstractGameModule] 通用接口实现
      */

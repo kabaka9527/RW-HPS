@@ -9,6 +9,8 @@
 
 package net.rwhps.server.util.game.command
 
+import net.rwhps.server.struct.list.Seq
+
 /**
  *
  *
@@ -20,5 +22,5 @@ internal abstract class AbstractCommandExec<V> {
 
     abstract fun exec(args: Array<String>, objectIn: V)
 
-    abstract fun tab()
+    abstract fun tab(userInput: String, candidates: Seq<String>)
 }

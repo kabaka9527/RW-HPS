@@ -114,7 +114,7 @@ class RelayRoom {
 
     var allmute = false
     // 代号: Lone Star
-    var battleRoyalLock: Boolean = false
+    //var playerTeamSize = -1
     var syncFlag = true
 
     private val site = AtomicInteger(0)

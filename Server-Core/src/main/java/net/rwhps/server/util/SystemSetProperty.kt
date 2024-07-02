@@ -14,18 +14,27 @@ package net.rwhps.server.util
  * @author Dr (dr@der.kim)
  */
 object SystemSetProperty {
+    /**
+     * 解决 Jline 在 Idea 上的问题
+     */
     fun setJlineIdea() {
         System.setProperty("org.jline.terminal.dumb", "true")
         /* Fix Idea */
         System.setProperty("jansi.passthrough", "true")
     }
 
+    /**
+     * 关闭IPV6监听
+     */
     fun setOnlyIpv4() {
         // F U C K IPV6
         System.setProperty("java.net.preferIPv6Stack", "false")
         System.setProperty("java.net.preferIPv4Stack", "true")
     }
 
+    /**
+     * 无头
+     */
     fun setAwtHeadless() {
         // F U C K Termux
         System.setProperty("java.awt.headless", "true")

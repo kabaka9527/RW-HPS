@@ -12,12 +12,13 @@ package net.rwhps.server.net.handler.tcp
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.socket.SocketChannel
 import net.rwhps.server.net.core.AbstractNet
+import net.rwhps.server.net.core.IRwHps
 
 /**
  * @author Dr (dr@der.kim)
  */
 @Sharable
-class StartGameNetTcp: AbstractNet() {
+class StartGameNetTcp(rwHps: IRwHps): AbstractNet(rwHps) {
 
     init {
         init()
@@ -25,6 +26,6 @@ class StartGameNetTcp: AbstractNet() {
 
     @Throws(Exception::class)
     override fun initChannel(socketChannel: SocketChannel) {
-        rwinit(socketChannel.pipeline())
+        initHandler(socketChannel.pipeline())
     }
 }

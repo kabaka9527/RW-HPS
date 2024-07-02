@@ -29,6 +29,14 @@ inline fun <R, T> T?.ifNullResult(block: () -> R, blockNotNull: (T) -> R): R {
     }
 }
 
+inline fun <R> String?.ifEmptyResult(block: () -> R, blockNotNull: (String) -> R): R {
+    return if (this.isNullOrEmpty()) {
+        block()
+    } else {
+        blockNotNull(this)
+    }
+}
+
 inline fun <R, T> T?.ifNullResult(result: R, blockNotNull: (T) -> R): R {
     return if (this == null) {
         result

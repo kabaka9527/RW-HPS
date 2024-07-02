@@ -28,15 +28,14 @@ class CommandsEx(handler: CommandHandler) {
     private fun registerCore(handler: CommandHandler) {
         handler.register("hi", "") { _: Array<String>?, con: AbstractNetConnect ->
             val out = GameOutputStream()
-
-            if (NetStaticData.ServerNetType == NullProtocol) {
+            if (NetStaticData.RwHps.netType == NullProtocol) {
                 out.writeString("SERVER CLOSE")
             } else {
                 out.writeString("ServerNetType")
-                out.writeString(NetStaticData.ServerNetType.name)
+                out.writeString(NetStaticData.RwHps.netType.name)
             }
 
-            when (NetStaticData.ServerNetType) {
+            when (NetStaticData.RwHps.netType) {
                 ServerProtocol, ServerProtocolOld, ServerTestProtocol -> {
                     out.writeString("PlayerSize")
                     out.writeInt(HeadlessModuleManage.hps.room.playerManage.playerGroup.size)
@@ -84,6 +83,7 @@ class CommandsEx(handler: CommandHandler) {
                     out.writeString("RoomNoStartSize")
                     out.writeInt(RelayRoom.roomNoStartSize)
                 }
+                HttpProtocol, RemoteControlProtocol, GameProtocol -> {}
                 GlobalProtocol, DedicatedToTheBackend, NullProtocol -> {}
             }
             con.sendPacket(out.createPacket(PacketType.GET_SERVER_INFO))

@@ -31,6 +31,10 @@ class AiPlayer(
 
     override fun kickPlayer(text: String, time: Int) {
         playerPrivateData.removePlayer()
+
+        con!!.room.playerManage.playerGroup.remove(this)
+        con!!.room.playerManage.playerAll.remove(this)
+
         super.kickPlayer(text, time)
     }
 }

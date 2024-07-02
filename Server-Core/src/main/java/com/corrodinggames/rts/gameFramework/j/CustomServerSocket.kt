@@ -9,14 +9,12 @@
 
 package com.corrodinggames.rts.gameFramework.j
 
-import net.rwhps.server.data.global.Data
-import net.rwhps.server.data.global.NetStaticData
 import net.rwhps.server.data.global.NetStaticData.netService
+import net.rwhps.server.game.manage.IRwHpsManage
 import net.rwhps.server.net.NetService
 import net.rwhps.server.net.core.IRwHps
-import net.rwhps.server.net.handler.tcp.StartGameNetTcp
-import net.rwhps.server.net.handler.tcp.StartMixProtocol
 import net.rwhps.server.plugin.internal.headless.HessMain
+import net.rwhps.server.plugin.internal.headless.inject.core.GameEngine
 import net.rwhps.server.util.inline.findField
 import net.rwhps.server.util.log.Log
 import java.io.Closeable
@@ -49,13 +47,9 @@ class CustomServerSocket(var1: ad): ServerAcceptRunnable(var1), Closeable {
         GameEe.aq()
         Thread.currentThread().name = "NewConnectionWorker-" + (if (f) "udp" else "tcp") + " - " + this.e
 
-        NetStaticData.ServerNetType = IRwHps.NetType.ServerProtocol
-        val init = if (Data.config.mixProtocolEnable) {
-            StartMixProtocol()
-        } else {
-            StartGameNetTcp()
-        }
-        HessMain.serverServerCommands.handleMessage("startnetservice $netServiceID true $port", init)
+        val iRwHps = IRwHpsManage.addIRwHps(this::class.java.classLoader, IRwHps.NetType.ServerProtocol)
+        GameEngine.iRwHps = iRwHps
+        HessMain.serverServerCommands.handleMessage("startnetservice $netServiceID true $port", iRwHps)
     }
 
     /**
@@ -91,5 +85,6 @@ class CustomServerSocket(var1: ad): ServerAcceptRunnable(var1), Closeable {
     override fun close() {
         Log.debug("[Close]")
         netService.find { it.id == netServiceID }!!.stop()
+        GameEngine.iRwHps = null
     }
 }

@@ -46,12 +46,6 @@ class PlayerRelay(
 
     /** List position  */
     var site = 0
-        set(value) {
-            if (field != value && con.relayRoom!!.battleRoyalLock) {
-                con.sendPackageToHOST(chatUserMessagePacketInternal("-qc -self_team ${value + 1}"))
-            }
-            field = value
-        }
     var watch = false
         private set
 

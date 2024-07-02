@@ -28,10 +28,14 @@ import java.util.concurrent.TimeUnit
 
 
 /**
+ * 所有连接的初始化部分
+ *
  * @author Dr (dr@der.kim)
  */
 @Sharable
-abstract class AbstractNet: ChannelInitializer<SocketChannel>() {
+abstract class AbstractNet(
+    val rwHps: IRwHps
+): ChannelInitializer<SocketChannel>() {
     private val ioGroup: EventExecutorGroup = DefaultEventExecutorGroup(128, ThreadFactoryName.nameThreadFactory("IO-Group"))
 
     private lateinit var newServerHandler: INetServerHandler
@@ -48,13 +52,18 @@ abstract class AbstractNet: ChannelInitializer<SocketChannel>() {
     }
 
     protected fun addTimeOut(channelPipeline: ChannelPipeline) {
-        channelPipeline.addLast(IdleStateHandler(0, 10, 0, TimeUnit.SECONDS))
+        channelPipeline.addLast("IdleStateHandler", IdleStateHandler(0, 10, 0, TimeUnit.SECONDS))
         channelPipeline.addLast(idleStateTrigger)
     }
 
+    /**
+     * 一键设置编码器
+     *
+     * @param channelPipeline ChannelPipeline
+     */
     protected open fun addPacketDecoderAndEncoder(channelPipeline: ChannelPipeline) {
-        channelPipeline.addLast(GamePacketDecoder())
-        channelPipeline.addLast(GamePacketEncoder())
+        channelPipeline.addLast("Decoder", GamePacketDecoder(rwHps))
+        channelPipeline.addLast("Encoder", GamePacketEncoder())
     }
 
     protected fun addNewServerHandler(channelPipeline: ChannelPipeline) {
@@ -65,15 +74,29 @@ abstract class AbstractNet: ChannelInitializer<SocketChannel>() {
         channelPipeline.addLast(ioGroup, newServerHandler)
     }
 
-    protected fun rwinit(channelPipeline: ChannelPipeline) {
+    open fun initHandler(channelPipeline: ChannelPipeline) {
         addTimeOut(channelPipeline)
         addPacketDecoderAndEncoder(channelPipeline)
         addNewServerHandler(channelPipeline)
-        //addNewServerHandlerExecutorGroup(channelPipeline)
+    }
+
+    protected fun removeHandler(channelPipeline: ChannelPipeline) {
+        channelPipeline.remove("IdleStateHandler")
+        channelPipeline.remove(idleStateTrigger)
+
+        channelPipeline.remove("Decoder")
+        channelPipeline.remove("Encoder")
+
+        channelPipeline.remove(newServerHandler)
     }
 
     internal fun getConnectSize(): Int {
         return idleStateTrigger.connectNum.get()
+    }
+
+    @Throws(Exception::class)
+    override fun initChannel(socketChannel: SocketChannel) {
+        initHandler(socketChannel.pipeline())
     }
 
     open fun close() {

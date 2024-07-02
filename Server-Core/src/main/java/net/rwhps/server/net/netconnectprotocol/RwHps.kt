@@ -12,7 +12,6 @@ package net.rwhps.server.net.netconnectprotocol
 import net.rwhps.server.core.ServiceLoader
 import net.rwhps.server.core.ServiceLoader.ServiceType
 import net.rwhps.server.io.packet.Packet
-import net.rwhps.server.io.packet.type.AbstractPacketType
 import net.rwhps.server.net.core.ConnectionAgreement
 import net.rwhps.server.net.core.IRwHps
 import net.rwhps.server.net.core.TypeConnect
@@ -28,11 +27,14 @@ import net.rwhps.server.util.log.exp.ImplementedException
  * @property abstractNetPacket AbstractNetPacket    : NetPacket
  * @author Dr (dr@der.kim)
  */
-open class RwHps(private val netType: IRwHps.NetType): IRwHps {
+open class RwHps(
+    private val classLoader: ClassLoader,
+    override val netType: IRwHps.NetType
+): IRwHps {
     override val typeConnect: TypeConnect = implementedException {
         try {
-            val protocolClass = ServiceLoader.getServiceClass(ServiceType.Protocol, netType.name)
-            ServiceLoader.getService(ServiceType.ProtocolType, netType.name, Class::class.java).newInstance(protocolClass) as TypeConnect
+            val protocolClass = ServiceLoader.getServiceClass(classLoader, ServiceType.Protocol, netType.name)
+            ServiceLoader.getService(classLoader, ServiceType.ProtocolType, netType.name, Class::class.java).newInstance(protocolClass) as TypeConnect
         } catch (e: ImplementedException) {
             object: TypeConnect {
                 override fun getTypeConnect(connectionAgreement: ConnectionAgreement): TypeConnect {
@@ -49,20 +51,14 @@ open class RwHps(private val netType: IRwHps.NetType): IRwHps {
         }
     }
 
-    override val abstractNetPacket: AbstractNetPacket = implementedException {
-        try {
-            ServiceLoader.getService(ServiceType.ProtocolPacket, netType.name)
-        } catch (e: ImplementedException) {
-            ServiceLoader.getService(ServiceType.ProtocolPacket, IRwHps.NetType.GlobalProtocol.name)
-        }.newInstance() as AbstractNetPacket
-    }
-
-    override val packetType: AbstractPacketType = implementedException {
-        try {
-            ServiceLoader.getServiceObject(ServiceType.PacketType, netType.name)
-        } catch (e: ImplementedException) {
-            ServiceLoader.getServiceObject(ServiceType.PacketType, IRwHps.NetType.GlobalProtocol.name)
-        } as AbstractPacketType
+    override val abstractNetPacket: AbstractNetPacket by lazy {
+        implementedException {
+            try {
+                ServiceLoader.getService(ServiceType.ProtocolPacket, netType.name)
+            } catch (e: ImplementedException) {
+                ServiceLoader.getService(ServiceType.ProtocolPacket, IRwHps.NetType.GlobalProtocol.name)
+            }.newInstance() as AbstractNetPacket
+        }
     }
 
     @Throws(ImplementedException::class)

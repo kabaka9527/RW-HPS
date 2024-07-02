@@ -10,7 +10,7 @@ package net.rwhps.server.util.algorithms
 
 import net.rwhps.server.data.global.Data
 import net.rwhps.server.util.IsUtils
-import net.rwhps.server.util.StringUtils
+import net.rwhps.server.util.str.StringUtils
 import net.rwhps.server.util.algorithms.codec.Base16Codec
 import java.math.BigInteger
 import java.nio.charset.Charset

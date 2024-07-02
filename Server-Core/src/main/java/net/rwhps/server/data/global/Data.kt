@@ -12,10 +12,11 @@ package net.rwhps.server.data.global
 import net.rwhps.server.command.ex.Vote
 import net.rwhps.server.core.Application
 import net.rwhps.server.data.bean.BeanCoreConfig
-import net.rwhps.server.data.bean.BeanNetConfig
 import net.rwhps.server.data.bean.BeanRelayConfig
 import net.rwhps.server.data.bean.BeanServerConfig
 import net.rwhps.server.data.bean.internal.BeanHeadlessConfig
+import net.rwhps.server.data.bean.internal.BeanMainParameters
+import net.rwhps.server.data.bean.internal.BeanNetConfig
 import net.rwhps.server.func.StrCons
 import net.rwhps.server.net.http.WebData
 import net.rwhps.server.struct.map.ObjectMap
@@ -30,8 +31,6 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
 /**
- * 别问我为什么要把@JvmField和val并排
- * 问就是好看
  * @author Dr (dr@der.kim)
  */
 object Data {
@@ -49,6 +48,8 @@ object Data {
 
     /** 服务器日志目录 */
     const val ServerLogPath = "/data/log"
+
+    const val ServerPlayerPath = "/data/player"
 
     /** 服务器地图目录 */
     const val ServerMapsPath = "/data/maps"
@@ -87,7 +88,7 @@ object Data {
     const val SERVER_ID_RELAY_GET = "net.rwhps.server.relayGetUUIDHex.Dr"
 
     /** 服务器主版本 */
-    const val SERVER_CORE_VERSION = "3.0.0-M5"
+    const val SERVER_CORE_VERSION = "3.0.0-M6"
 
     /** 服务器Topt密码  */
     const val TOPT_KEY = "net.rwhps.server.topt # RW-HPS Team"
@@ -97,6 +98,8 @@ object Data {
 
     /** EULA 的版本 */
     const val SERVER_EULA_VERSION = "1.1.1"
+
+    const val userAgent: String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.51"
 
 
     @JvmField
@@ -116,10 +119,6 @@ object Data {
     val RELAY_COMMAND = CommandHandler(".")
 
     internal val PING_COMMAND = CommandHandler("")
-
-    /** Map */
-    @JvmField
-    val MapsMap = ObjectMap<String, String>()
 
     @JvmField
     val core = Application()
@@ -145,6 +144,8 @@ object Data {
     /** 服务器默认 WebData 数据 */
     val webData = WebData()
 
+    internal lateinit var mainParameters: BeanMainParameters
+
     /**
      * 可控变量
      */
@@ -159,15 +160,7 @@ object Data {
     @Volatile
     var startServer = false
 
-    @Volatile
-    var running = true
-        set(value) {
-            running = value
-
-        }
-
     val headlessName: String = "RW-HPS Core Headless"
-
 
     internal val privateOut = System.out
     internal lateinit var privateReader: LineReader
@@ -176,8 +169,6 @@ object Data {
     val defPrint = StrCons { obj: String -> Log.clog(obj) }
 
     var serverCountry = "EN"
-
-    const val SEC_IN_NANO = 1000000000L
 
     val neverEnd=false
 }

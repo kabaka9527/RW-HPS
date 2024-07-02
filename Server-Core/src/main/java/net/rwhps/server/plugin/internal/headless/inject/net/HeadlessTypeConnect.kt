@@ -18,6 +18,7 @@ import net.rwhps.server.net.core.TypeConnect
 import net.rwhps.server.net.core.server.AbstractNetConnect
 import net.rwhps.server.plugin.internal.headless.inject.core.GameEngine.netEngine
 import net.rwhps.server.plugin.internal.headless.inject.lib.PlayerConnectX
+import net.rwhps.server.util.log.Log
 
 /**
  * Parse the [net.rwhps.server.net.core.IRwHps.NetType.ServerProtocol] protocol
@@ -83,7 +84,8 @@ open class HeadlessTypeConnect: TypeConnect {
             if (packet.status == Control.EventNext.CONTINUE) {
                 con.receivePacket(packet)
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.error(e)
         }
     }
 

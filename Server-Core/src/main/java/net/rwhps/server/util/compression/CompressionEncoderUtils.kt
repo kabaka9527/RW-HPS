@@ -10,8 +10,8 @@
 package net.rwhps.server.util.compression
 
 import net.rwhps.server.util.compression.core.AbstractEncoder
-import net.rwhps.server.util.compression.seven.SevenZipEncoder
-import net.rwhps.server.util.compression.zip.ZipEncoder
+import net.rwhps.server.util.compression.encoder.SevenZipEncoder
+import net.rwhps.server.util.compression.encoder.ZipEncoder
 
 /**
  * 获取压缩构造器

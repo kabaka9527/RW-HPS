@@ -18,5 +18,5 @@ import org.jline.reader.Candidate
  * @author Dr (dr@der.kim)
  */
 interface AbstractTabCompletion {
-    fun complete(params: String, candidates: MutableList<Candidate>)
+    fun complete(paramsIn: String, candidates: MutableList<Candidate>)
 }

@@ -9,12 +9,12 @@
 
 package net.rwhps.server.io.packet
 
-import net.rwhps.server.data.global.NetStaticData
 import net.rwhps.server.func.Control
 import net.rwhps.server.io.GameInputStream
 import net.rwhps.server.io.GameOutputStream
 import net.rwhps.server.io.packet.type.AbstractPacketType
 import net.rwhps.server.io.packet.type.PacketType
+import net.rwhps.server.net.core.IRwHps
 import net.rwhps.server.struct.SerializerTypeAll
 import net.rwhps.server.util.inline.toStringHex
 import net.rwhps.server.util.log.Log
@@ -35,7 +35,7 @@ class Packet {
     var status = Control.EventNext.CONTINUE
 
     constructor(type0: Int, bytes: ByteArray) {
-        this.type = NetStaticData.RwHps.packetType.from(type0)
+        this.type = IRwHps.packetType.from(type0)
         this.bytes = bytes
         check(type0)
     }

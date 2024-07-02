@@ -15,9 +15,14 @@ import net.rwhps.server.data.global.Data
 import net.rwhps.server.game.event.core.EventListenerHost
 import net.rwhps.server.game.event.game.*
 import net.rwhps.server.net.Administration.PlayerInfo
+import net.rwhps.server.struct.list.Seq
 import net.rwhps.server.util.Time.millis
 import net.rwhps.server.util.annotations.core.EventListenerHandler
+import net.rwhps.server.util.compression.CompressionEncoderUtils
+import net.rwhps.server.util.file.FileName.getFileNameNoSuffix
+import net.rwhps.server.util.file.FileUtils
 import net.rwhps.server.util.inline.coverConnect
+import net.rwhps.server.util.inline.toPrettyPrintingJson
 import net.rwhps.server.util.log.Log
 import net.rwhps.server.util.log.Log.error
 import java.io.IOException
@@ -97,6 +102,12 @@ class Event: EventListenerHost {
         if (Data.configServer.enterAd.isNotBlank()) {
             player.sendSystemMessage(Data.configServer.enterAd)
         }
+
+        if (Data.configServer.saveRePlayFile) {
+            playerJoinEvent.player.infoObject.run {
+                FileUtils.getFolder(Data.ServerPlayerPath).toFile("${this["Position"]}.json").writeFileByte(toPrettyPrintingJson().toByteArray())
+            }
+        }
     }
 
     @EventListenerHandler
@@ -126,6 +137,9 @@ class Event: EventListenerHost {
             )) {
             Threads.closeTimeTask(CallTimeTask.AutoStartTask)
         }
+        if (Data.configServer.saveRePlayFile) {
+            FileUtils.getFolder(Data.ServerPlayerPath).toFile("${playerLeaveEvent.player.position}.json").delete()
+        }
     }
 
     @EventListenerHandler
@@ -136,11 +150,28 @@ class Event: EventListenerHost {
             serverGameStartEvent.gameModule.room.call.sendSystemMessage(Data.configServer.startAd)
         }
 
+        if (Data.configServer.saveRePlayFile) {
+            serverGameStartEvent.gameModule.room.playerData = Seq<Map<String, Any>>().apply {
+                serverGameStartEvent.gameModule.room.playerManage.playerAll.eachAll {
+                    if (!it.isAi) {
+                        add(it.infoObject)
+                    }
+                }
+            }
+        }
+
         Log.clog("[Start New Game]")
     }
 
     @EventListenerHandler
     fun registerGameOverEvent(serverGameOverEvent: ServerGameOverEvent) {
+        CompressionEncoderUtils.zipStream().apply {
+            serverGameOverEvent.gameModule.room.playerData!!.eachAll {
+                addCompressBytes("${it["Position"]}.json", it.toPrettyPrintingJson().toByteArray())
+            }
+        }.run {
+            FileUtils.getFolder(Data.ServerPlayerPath).toFile("${getFileNameNoSuffix(serverGameOverEvent.gameModule.room.replayFileName)}.zip").writeFileByte(this.flash())
+        }
         System.gc()
     }
 

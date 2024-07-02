@@ -14,7 +14,6 @@ import net.rwhps.server.struct.list.Seq
 import net.rwhps.server.struct.map.BaseMap.Companion.toSeq
 import net.rwhps.server.struct.map.ObjectMap
 import net.rwhps.server.struct.map.OrderedMap
-import net.rwhps.server.util.annotations.DidNotFinish
 
 /**
  * Mods 加载管理器
@@ -31,9 +30,6 @@ object ModManage {
 
     /** 启用的MOD(名字)-暂时无效 */
     private var enabledModsName = Seq<String>()
-
-    /** 加载的单位数量 */
-    private var loadUnitsCount = 0
 
     /** MOD的名字列表 */
     private var modList = Seq<String>()
@@ -76,12 +72,4 @@ object ModManage {
      */
     @JvmStatic
     fun getModsList(): Seq<String> = modList
-
-    /**
-     * 加入 Mod 到白名单 [enabledModsName]
-     * @return Seq<String>
-     */
-    @DidNotFinish
-    @JvmStatic
-    fun addMod(): Seq<String> = modList
 }

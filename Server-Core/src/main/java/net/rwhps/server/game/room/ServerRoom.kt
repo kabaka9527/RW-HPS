@@ -23,6 +23,7 @@ import net.rwhps.server.game.headless.core.AbstractGameModule
 import net.rwhps.server.game.manage.CallManage
 import net.rwhps.server.game.manage.MapManage
 import net.rwhps.server.game.manage.PlayerManage
+import net.rwhps.server.struct.list.Seq
 import net.rwhps.server.util.Time
 import net.rwhps.server.util.game.command.CommandHandler
 import net.rwhps.server.util.log.Log
@@ -54,7 +55,9 @@ class ServerRoom(
     var endTime = 0
         private set
 
-    var isAfk = true
+    val isAfk get() = Data.configServer.isAfk
+    val muteAll get() = Data.configServer.muteAll
+
     var isMixPlayer = false
 
     val maps = GameMaps()
@@ -64,6 +67,7 @@ class ServerRoom(
     var flagData = ServerCacheFlag()
     private var forcedReturn = false
     internal var gameOverData: GameOverData? = null
+    internal var playerData: Seq<Map<String, Any>>? = null
 
     internal fun roomStartGame() {
         startTime = Time.concurrentSecond()
