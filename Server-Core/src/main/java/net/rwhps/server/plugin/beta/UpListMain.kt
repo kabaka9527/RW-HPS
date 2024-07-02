@@ -67,6 +67,7 @@ internal class UpListMain: Plugin() {
         handler.removeCommand("upserverlistnew")
 
         handler.register("uplist", "[command...]", "serverCommands.upserverlist") { args: Array<String>?, log: StrCons ->
+
             if (!args.isNullOrEmpty()) {
                 when (args[0]) {
                     "add" -> NetStaticData.checkServerStartNet { if (args.size > 1) add(log, args[1]) else add(log) }
@@ -82,24 +83,37 @@ internal class UpListMain: Plugin() {
     }
 
     override fun registerServerClientCommands(handler: CommandHandler) {
+        fun isAdmin(player: PlayerHess): Boolean {
+            if (player.isAdmin) {
+                return true
+            }
+            player.sendSystemMessage(player.i18NBundle.getinput("err.noAdmin"))
+            return false
+        }
+
         handler.register("toup", "#up") { _: Array<String>, player: PlayerHess ->
-            when (uplistFlag) {
-                0 -> {
-                    handler.handleMessage("uplist add")
-                    player.sendSystemMessage("add uplist")
-                    uplistFlag = 1
+            if (isAdmin(player)) {
+                when (uplistFlag) {
+                    0 -> {
+                        handler.handleMessage("uplist add")
+                        player.sendSystemMessage("add uplist")
+                        uplistFlag = 1
+                    }
+                    else -> player.sendSystemMessage("uplisting")
                 }
-                else -> player.sendSystemMessage("uplisting")
+
             }
         }
         handler.register("tonp", "#up") { _: Array<String>, player: PlayerHess ->
-            when (uplistFlag) {
-                1 -> {
-                    handler.handleMessage("uplist remove")
-                    player.sendSystemMessage("remove uplist")
-                    uplistFlag = 0
+            if (isAdmin(player)) {
+                when (uplistFlag) {
+                    1 -> {
+                        handler.handleMessage("uplist remove")
+                        player.sendSystemMessage("remove uplist")
+                        uplistFlag = 0
+                    }
+                    else -> player.sendSystemMessage("no uplist")
                 }
-                else -> player.sendSystemMessage("no uplist")
             }
         }
     }
