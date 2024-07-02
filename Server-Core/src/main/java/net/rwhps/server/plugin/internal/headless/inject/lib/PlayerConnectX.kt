@@ -194,7 +194,6 @@ class PlayerConnectX(
             }
         }
 
-
         serverConnect.sendPacket(netEnginePackaging.transformPacket(packetHess))
     }
 

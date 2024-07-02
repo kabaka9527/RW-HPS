@@ -19,7 +19,7 @@ import net.rwhps.server.struct.map.ObjectMap
 import net.rwhps.server.struct.map.OrderedMap
 import net.rwhps.server.util.compression.CompressionAlgorithm
 import net.rwhps.server.util.compression.CompressionDecoderUtils
-import net.rwhps.server.util.compression.gzip.GzipDecoder
+import net.rwhps.server.util.compression.decoder.GzipDecoder
 import net.rwhps.server.util.file.plugin.DefaultSerializers
 import net.rwhps.server.util.file.plugin.value.SerializableValue
 import net.rwhps.server.util.file.plugin.value.Value

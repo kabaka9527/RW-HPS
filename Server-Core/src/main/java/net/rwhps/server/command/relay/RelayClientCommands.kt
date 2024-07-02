@@ -11,13 +11,16 @@ package net.rwhps.server.command.relay
 
 import net.rwhps.server.data.global.Data
 import net.rwhps.server.data.global.NetStaticData
+import net.rwhps.server.game.room.RelayRoom
 import net.rwhps.server.net.netconnectprotocol.internal.server.chatUserMessagePacketInternal
 import net.rwhps.server.net.netconnectprotocol.realize.GameVersionRelay
 import net.rwhps.server.util.IsUtils
 import net.rwhps.server.util.Time
+import net.rwhps.server.util.algorithms.HexUtils
 import net.rwhps.server.util.annotations.mark.PrivateMark
 import net.rwhps.server.util.file.plugin.PluginManage
 import net.rwhps.server.util.game.command.CommandHandler
+import java.math.BigInteger
 
 /**
  * @author Dr (dr@der.kim)
@@ -27,7 +30,10 @@ internal class RelayClientCommands(handler: CommandHandler) {
     private val localeUtil = Data.i18NBundle
 
     private fun isAdmin(con: GameVersionRelay, sendMsg: Boolean = true): Boolean {
-        if (con.relayRoom?.admin === con) {
+        if (con.room == null || con.room!!.admin == null) {
+            return false
+        }
+        if (con.room!!.admin!!.name == con.name && con.room!!.admin!!.registerPlayerId == con.registerPlayerId) {
             return true
         }
         if (sendMsg) {
@@ -54,10 +60,14 @@ internal class RelayClientCommands(handler: CommandHandler) {
             sendMsg(con, str.toString())
         }
 
+        handler.register("myid", "clientCommands.-") { _: Array<String>?, con: GameVersionRelay ->
+            sendMsg(con, BigInteger(HexUtils.decodeHex(con.registerPlayerId!!)).toInt().let { if (it < 0) -it else it }.toString())
+        }
+
         handler.register("sync", "<on/off>", "#同步") { args: Array<String>, con: GameVersionRelay ->
             if (isAdmin(con, false)) {
-                con.relayRoom!!.syncFlag = "on" == args[0]
-                sendMsg(con, localeUtil.getinput("server.sync", if (con.relayRoom!!.syncFlag) "启用" else "禁止"))
+                con.room!!.syncFlag = "on" == args[0]
+                sendMsg(con, localeUtil.getinput("server.sync", if (con.room!!.syncFlag) "启用" else "禁止"))
             }
         }
 
@@ -66,7 +76,7 @@ internal class RelayClientCommands(handler: CommandHandler) {
                 val conTg = findPlayerUUIDAll(con, args[0])
                 if (conTg[0] != "") {
                     var flag = false
-                    con.relayRoom!!.abstractNetConnectIntMap.forEach { _, u ->
+                    con.room!!.abstractNetConnectIntMap.forEach { _, u ->
                         if (conTg[1] == u.registerPlayerId) {
                             flag = true
                             sendMsg(con, "玩家 ${conTg[1]}, 还在线, 不能取代")
@@ -77,35 +87,21 @@ internal class RelayClientCommands(handler: CommandHandler) {
                         return@register
                     }
 
-                    con.relayRoom!!.replacePlayerHex = conTg[0]
+                    con.room!!.replacePlayerHex = conTg[0]
                     sendMsg(con, "准备取代玩家 ${conTg[1]}")
                 }
             }
         }
 
-        handler.register("am", "<on/off>", "#混战") { args: Array<String>, con: GameVersionRelay ->
-            if (isAdmin(con)) {
-                con.relayRoom!!.battleRoyalLock = "on" == args[0]
-                if (con.relayRoom!!.battleRoyalLock) {
-                    con.relayRoom!!.abstractNetConnectIntMap.forEach {
-                        if (it.value.playerRelay != null) {
-                            it.value.sendPackageToHOST(chatUserMessagePacketInternal("-qc -self_team ${it.value.playerRelay!!.site + 1}"))
-                        }
-                    }
-                }
-                sendMsg(con, localeUtil.getinput("server.amTeam", if (con.relayRoom!!.battleRoyalLock) "开启" else "关闭"))
-            }
-        }
-
         handler.register("kickx", "<Name/Position>", "#Kick Player") { args: Array<String>, con: GameVersionRelay ->
             if (isAdmin(con)) {
-                if (con.relayRoom!!.isStartGame && (con.relayRoom!!.startGameTime + 300) < Time.concurrentSecond()) {
+                if (con.room!!.isStartGame && (con.room!!.startGameTime + 600) < Time.concurrentSecond()) {
                     sendMsg(con,"已经开局十分钟了 不能再BAN")
                     return@register
                 }
                 val conTg: GameVersionRelay? = findPlayer(con, args[0])
                 conTg?.let {
-                    con.relayRoom!!.relayKickData["KICK" + it.playerRelay!!.uuid] = Time.concurrentSecond() + 60
+                    con.room!!.relayKickData["KICK" + it.playerRelay!!.uuid] = Time.concurrentSecond() + 60
 
                     it.kick("你被踢出服务器")
                     sendMsg(con, "Kick : ${args[0]} OK")
@@ -115,14 +111,10 @@ internal class RelayClientCommands(handler: CommandHandler) {
 
         handler.register("ban", "<Name/Position>", "#Ban Player") { args: Array<String>, con: GameVersionRelay ->
             if (isAdmin(con)) {
-                if (con.relayRoom!!.isStartGame && con.relayRoom!!.startGameTime < Time.concurrentSecond()) {
-                    sendMsg(con,"已经开局五分钟了 不能再BAN")
-                    return@register
-                }
                 val conTg: GameVersionRelay? = findPlayer(con, args[0])
                 conTg?.let {
-                    con.relayRoom!!.relayKickData["KICK" + it.playerRelay!!.uuid] = Int.MAX_VALUE
-                    con.relayRoom!!.relayKickData["BAN" + it.ip] = Int.MAX_VALUE
+                    con.room!!.relayKickData["KICK" + it.playerRelay!!.uuid] = Int.MAX_VALUE
+                    con.room!!.relayKickData["BAN" + it.ip] = Int.MAX_VALUE
                     it.kick("你被服务器 BAN")
                     sendMsg(con, "BAN : ${args[0]} OK")
                 }
@@ -131,8 +123,8 @@ internal class RelayClientCommands(handler: CommandHandler) {
 
         handler.register("allmute", "#All Player mute") { _: Array<String>, con: GameVersionRelay ->
             if (isAdmin(con)) {
-                con.relayRoom!!.allmute = !con.relayRoom!!.allmute
-                sendMsg(con, "全局禁言状态是 :  ${if (con.relayRoom!!.allmute) "开启" else "关闭"}")
+                con.room!!.allmute = !con.room!!.allmute
+                sendMsg(con, "全局禁言状态是 :  ${if (con.room!!.allmute) "开启" else "关闭"}")
             }
         }
 
@@ -157,7 +149,7 @@ internal class RelayClientCommands(handler: CommandHandler) {
 
         findNameIn?.let { findName ->
             var count = 0
-            con.relayRoom!!.abstractNetConnectIntMap.values.forEach {
+            con.room!!.abstractNetConnectIntMap.values.forEach {
                 if (it.playerRelay!!.name.contains(findName, ignoreCase = true)) {
                     conTg = it
                     count++
@@ -174,7 +166,7 @@ internal class RelayClientCommands(handler: CommandHandler) {
         }
 
         findPositionIn?.let { findPosition ->
-            con.relayRoom!!.abstractNetConnectIntMap.values.forEach {
+            con.room!!.abstractNetConnectIntMap.values.forEach {
                 if (it.playerRelay?.site == findPosition) {
                     conTg = it
                 }
@@ -191,7 +183,7 @@ internal class RelayClientCommands(handler: CommandHandler) {
     private fun findPlayerUUIDAll(con: GameVersionRelay, findIn: String): Array<String> {
         val uuidHexTg = arrayOf("", "")
 
-        if (!con.relayRoom!!.isStartGame) {
+        if (!con.room!!.isStartGame) {
             sendMsg(con, "房间未开始游戏")
             return uuidHexTg
         }
@@ -207,7 +199,7 @@ internal class RelayClientCommands(handler: CommandHandler) {
 
         findNameIn?.let { findName ->
             var count = 0
-            con.relayRoom!!.relayPlayersData.values.forEach {
+            con.room!!.relayPlayersData.values.forEach {
                 if (it.name.contains(findName, ignoreCase = true)) {
                     uuidHexTg[0] = it.con.registerPlayerId!!
                     uuidHexTg[1] = it.con.name
@@ -225,7 +217,7 @@ internal class RelayClientCommands(handler: CommandHandler) {
         }
 
         findPositionIn?.let { findPosition ->
-            con.relayRoom!!.relayPlayersData.values.forEach {
+            con.room!!.relayPlayersData.values.forEach {
                 if (it.site == findPosition) {
                     uuidHexTg[0] = it.con.registerPlayerId!!
                     uuidHexTg[1] = it.con.name

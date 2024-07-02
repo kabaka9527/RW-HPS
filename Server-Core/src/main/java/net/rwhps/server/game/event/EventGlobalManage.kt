@@ -19,7 +19,6 @@ import java.util.function.Consumer
  * @date 2023/7/5 10:00
  * @author Dr (dr@der.kim)
  */
-@Suppress("EXPOSED_SUPER_CLASS")
 class EventGlobalManage: AbstractEventManage(AbstractGlobalEventImpl::class.java) {
     /**
      * 执行新事件

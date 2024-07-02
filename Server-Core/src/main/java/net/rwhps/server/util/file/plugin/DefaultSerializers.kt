@@ -55,7 +55,7 @@ internal object DefaultSerializers {
                 return paramDataInput.readShort()
             }
         })
-        MachineFriendlySerializers.setSerializer(Integer::class.java, object: TypeSerializer<Int> {
+        MachineFriendlySerializers.setSerializer(Int::class.java, object: TypeSerializer<Int> {
             @Throws(IOException::class)
             override fun write(paramDataOutput: GameOutputStream, objectParam: Int) {
                 paramDataOutput.writeInt(objectParam)

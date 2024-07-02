@@ -27,6 +27,7 @@ import net.rwhps.server.plugin.internal.headless.inject.core.GameEngine
 import net.rwhps.server.struct.map.BaseMap.Companion.toSeq
 import net.rwhps.server.util.IsUtils.isNumeric
 import net.rwhps.server.util.IsUtils.notIsNumeric
+import net.rwhps.server.util.algorithms.HexUtils
 import net.rwhps.server.util.console.tab.TabDefaultEnum.PlayerPosition
 import net.rwhps.server.util.console.tab.TabDefaultEnum.PlayerPositionAI
 import net.rwhps.server.util.file.plugin.PluginManage
@@ -34,9 +35,11 @@ import net.rwhps.server.util.game.command.CommandHandler
 import net.rwhps.server.util.inline.findField
 import net.rwhps.server.util.log.Log.error
 import java.io.IOException
+import java.math.BigInteger
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import com.corrodinggames.rts.game.units.h as SupBuild
 
 /**
  * @author Dr (dr@der.kim)
@@ -99,6 +102,8 @@ internal class ClientCommands(handler: CommandHandler) {
             if (isAdmin(player)) {
                 if (Data.configServer.enableAI) {
                     GameEngine.data.room.playerManage.addAI()
+                } else {
+                    player.sendSystemMessage("请在配置文件启用AI")
                 }
             }
         }
@@ -335,7 +340,7 @@ internal class ClientCommands(handler: CommandHandler) {
                     i++
                 }
                 val inputMapName = response.toString().replace("'", "").replace(" ", "").replace("-", "").replace("_", "")
-                val mapPlayer = Data.MapsMap[inputMapName]
+                val mapPlayer = MapManage.gameMaps[inputMapName]
                 if (inputMapName.equals("DEF", ignoreCase = true)) {
                     GameEngine.netEngine.az = "maps/skirmish/[z;p10]Crossing Large (10p).tmx"
                     GameEngine.netEngine.ay.a = ai.a
@@ -507,7 +512,7 @@ internal class ClientCommands(handler: CommandHandler) {
                 player.sendSystemMessage(player.i18NBundle.getinput("clientCommands.nuke.ping"))
                 player.addData<(AbstractNetConnectServer, GamePingActions, Float, Float)->Unit>("Ping") { _, _, x, y ->
                     GameEngine.data.gameFunction.suspendMainThreadOperations {
-                        val obj = com.corrodinggames.rts.game.units.h::class.java.findField("n", com.corrodinggames.rts.game.units.a.s::class.java)!!.get(null) as com.corrodinggames.rts.game.units.a.s
+                        val obj = SupBuild::class.java.findField("n", com.corrodinggames.rts.game.units.a.s::class.java)!!.get(null) as com.corrodinggames.rts.game.units.a.s
                         val no = com.corrodinggames.rts.game.units.h(false)
                         no.a(obj, false, PointF(x, y), null)
                         no.b(n.k(player.index))
@@ -527,7 +532,7 @@ internal class ClientCommands(handler: CommandHandler) {
                 player.sendSystemMessage(player.i18NBundle.getinput("clientCommands.clone.ping"))
                 player.addData<(AbstractNetConnectServer, GamePingActions, Float, Float)->Unit>("Ping") { _, _, x, y ->
                     gameModule.gameFunction.suspendMainThreadOperations {
-                        val obj = com.corrodinggames.rts.game.units.h::class.java.findField("j", com.corrodinggames.rts.game.units.a.s::class.java)!!.get(null) as com.corrodinggames.rts.game.units.a.s
+                        val obj = SupBuild::class.java.findField("j", com.corrodinggames.rts.game.units.a.s::class.java)!!.get(null) as com.corrodinggames.rts.game.units.a.s
                         val no = com.corrodinggames.rts.game.units.h(false)
                         no.bX = n.k(player.index)
                         no.a(obj, false, PointF(x, y), null)
@@ -537,7 +542,9 @@ internal class ClientCommands(handler: CommandHandler) {
                 }
             }
         }
-
+        handler.register("myid", "clientCommands.-") { _: Array<String>, player: PlayerHess ->
+            player.sendSystemMessage(player.i18NBundle.getinput("myid", BigInteger(HexUtils.decodeHex(player.connectHexID)).toInt().let { if (it < 0) -it else it }))
+        }
     }
 
     init {

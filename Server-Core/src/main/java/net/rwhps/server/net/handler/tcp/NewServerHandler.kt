@@ -11,7 +11,6 @@ package net.rwhps.server.net.handler.tcp
 
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
-import net.rwhps.server.data.global.NetStaticData
 import net.rwhps.server.game.event.global.NetConnectNewEvent
 import net.rwhps.server.io.packet.Packet
 import net.rwhps.server.net.core.AbstractNet
@@ -41,8 +40,8 @@ internal class NewServerHandler(abstractNet: AbstractNet): INetServerHandler(abs
                 var type = attr.get()
 
                 if (type == null) {
-                    val connectionAgreement = ConnectionAgreement(ctx, abstractNet.nettyChannelData)
-                    type = NetStaticData.RwHps.typeConnect.getTypeConnect(connectionAgreement)
+                    val connectionAgreement = ConnectionAgreement(ctx, abstractNet.nettyChannelData, abstractNet.rwHps)
+                    type = abstractNet.rwHps.typeConnect.getTypeConnect(connectionAgreement)
                     attr.set(type)
 
                     val newConnectEvent = NetConnectNewEvent(connectionAgreement)
@@ -64,7 +63,6 @@ internal class NewServerHandler(abstractNet: AbstractNet): INetServerHandler(abs
     }
 
 
-    @Deprecated("Deprecated in Netty")
     @Throws(Exception::class)
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable?) {
         cause?.let {

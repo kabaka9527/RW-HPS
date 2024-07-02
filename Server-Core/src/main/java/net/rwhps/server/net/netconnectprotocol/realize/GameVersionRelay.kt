@@ -64,7 +64,7 @@ import java.util.*
  *
  * @property permissionStatus       Connection authentication status
  * @property netConnectAuthenticate Connection validity verification
- * @property relayRoom                  Relay instance
+ * @property room                  Relay instance
  * @property site                   Connect the forwarding location within the RELAY
  * @property cachePacket            Cached Package
  * @property relaySelect            Function1<String, Unit>?
@@ -87,7 +87,7 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
     override var permissionStatus: RelayStatus = RelayStatus.InitialConnection
         internal set
 
-    override var relayRoom: RelayRoom? = null
+    override var room: RelayRoom? = null
         protected set
 
     var site = -1
@@ -165,7 +165,7 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
                     idCustom(queryString)
                 }
             } else {
-                this.relayRoom = relayRoom
+                this.room = relayRoom
                 addRelayConnect()
             }
         }
@@ -259,17 +259,12 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
             }
 
             val message: String = inStream.readString()
-            var block = false
 
-            if (relayRoom!!.allmute) {
+            if (room!!.allmute || playerRelay!!.mute > Time.concurrentSecond()) {
                 return
             }
 
             playerRelay!!.lastSentMessage = message
-
-            if (block) {
-                return
-            }
 
             run command@{
                 if (message.startsWith(".") || message.startsWith("-")) {
@@ -281,11 +276,11 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
                         }
                         CommandHandler.ResponseType.manyArguments -> {
                             val msg = "Too many arguments. Usage: " + response.command.text + " " + response.command.paramText
-                            sendPacket(NetStaticData.RwHps.abstractNetPacket.getSystemMessagePacket(msg))
+                            sendPacket(rwHps.abstractNetPacket.getSystemMessagePacket(msg))
                         }
                         CommandHandler.ResponseType.fewArguments -> {
                             val msg = "Too few arguments. Usage: " + response.command.text + " " + response.command.paramText
-                            sendPacket(NetStaticData.RwHps.abstractNetPacket.getSystemMessagePacket(msg))
+                            sendPacket(rwHps.abstractNetPacket.getSystemMessagePacket(msg))
                         }
                         else -> {
                             sendPackageToHOST(packet)
@@ -306,34 +301,34 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
     override fun sendRelayServerId(multicast: Boolean) {
         try {
             connectReceiveData.inputPassword = false
-            if (relayRoom == null) {
+            if (room == null) {
                 Log.clog("sendRelayServerId -> relay : null")
-                relayRoom = NetStaticData.relayRoom
+                room = NetStaticData.relayRoom
             }
 
 
             if (site != -1) {
-                relayRoom!!.removeAbstractNetConnect(site)
+                room!!.removeAbstractNetConnect(site)
                 // 这个代表是第二任 (后妈)
                 site = -2
             }
 
-            relayRoom!!.admin = this
+            room!!.admin = this
 
-            val public = false
+            val public =false
             val o = GameOutputStream()
             if (clientVersion >= newRelayProtocolVersion) {
                 o.writeByte(2)
                 o.writeBoolean(true)
                 o.writeBoolean(true)
                 o.writeBoolean(true)
-                o.writeString(relayRoom!!.serverUuid)
-                o.writeBoolean(relayRoom!!.isMod) //MOD
+                o.writeString(room!!.serverUuid)
+                o.writeBoolean(room!!.isMod) //MOD
                 o.writeBoolean(public)
                 o.writeBoolean(true)
                 o.writeString(
                 """
-                    {{RELAY-CN}} Room ID : ${Data.configRelay.mainID + relayRoom!!.id}
+                    {{RELAY-CN}} Room ID : ${Data.configRelay.mainID + room!!.id}
                     你的房间是 <${if (public) "开放" else "隐藏"}> 在列表
                     This Server Use RW-HPS Project (Test)
                 """.trimIndent()
@@ -348,17 +343,17 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
                 // removeThisConnection
                 o.writeBoolean(true)
                 // useServerId
-                o.writeIsString(relayRoom!!.serverUuid)
+                o.writeIsString(room!!.serverUuid)
                 // useMods
-                o.writeBoolean(relayRoom!!.isMod) //MOD
+                o.writeBoolean(room!!.isMod) //MOD
                 // showPublicly
                 o.writeBoolean(public)
                 // relayMessageOnServer
                 o.writeString(
                 """
-                    {{RELAY-CN}} Room ID : ${Data.configRelay.mainID + relayRoom!!.id}
+                    {{RELAY-CN}} Room ID : ${Data.configRelay.mainID + room!!.id}
                     你的房间是 <${if (public) "开放" else "隐藏"}> 在列表
-                    This Server Use RW-HPS Project (Test)
+                    This Server Use RW-HPS Project
                 """.trimIndent()
                 )
                 // useMulticast
@@ -367,17 +362,17 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
 
             sendPacket(o.createPacket(PacketType.RELAY_BECOME_SERVER))
             sendPacket(
-                    NetStaticData.RwHps.abstractNetPacket.getChatMessagePacket(
+                    rwHps.abstractNetPacket.getChatMessagePacket(
                             Data.i18NBundle.getinput(
                                     "relay.server.admin.connect",
-                                    Data.configRelay.mainID + relayRoom!!.id,
-                                    Data.configRelay.mainID + relayRoom!!.internalID.toString()
+                                    Data.configRelay.mainID + room!!.id,
+                                    Data.configRelay.mainID + room!!.internalID.toString()
                             ), "RELAY_CN-ADMIN", 5
                     )
             )
             sendPacket(
-                    NetStaticData.RwHps.abstractNetPacket.getChatMessagePacket(
-                            Data.i18NBundle.getinput("relay", Data.configRelay.mainID + relayRoom!!.id), "RELAY_CN-ADMIN", 5
+                    rwHps.abstractNetPacket.getChatMessagePacket(
+                            Data.i18NBundle.getinput("relay", Data.configRelay.mainID + room!!.id), "RELAY_CN-ADMIN", 5
                     )
             )
 
@@ -386,7 +381,7 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
              * 禁止玩家使用 Server/Relay 做玩家名
              */
             if (name.equals("SERVER", ignoreCase = true) || name.equals("RELAY", ignoreCase = true)) {
-                relayRoom!!.re() // Close Room
+                room!!.re() // Close Room
             }
         } catch (e: Exception) {
             error(e)
@@ -416,12 +411,12 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
     }
 
     override fun addGroup(packet: Packet) {
-        relayRoom!!.groupNet.broadcastAndUDP(packet)
+        room!!.groupNet.broadcastAndUDP(packet)
     }
 
     override fun addGroupPing(packet: Packet) {
         try {
-            relayRoom!!.groupNet.broadcastAndUDP(packet)
+            room!!.groupNet.broadcastAndUDP(packet)
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -432,14 +427,14 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
             permissionStatus = RelayStatus.PlayerPermission
 
             connectReceiveData.inputPassword = false
-            if (relayRoom == null) {
+            if (room == null) {
                 Log.clog("?????")
-                relayRoom = NetStaticData.relayRoom
+                room = NetStaticData.relayRoom
             }
 
 
-            site = relayRoom!!.setAddPosition()
-            relayRoom!!.setAbstractNetConnect(this)
+            site = room!!.setAddPosition()
+            room!!.setAbstractNetConnect(this)
 
             val o = GameOutputStream()
             if (clientVersion >= newRelayProtocolVersion) {
@@ -451,27 +446,27 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
                 // User UUID
                 o.writeIsString(null)
                 o.writeIsString(ip)
-                relayRoom!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
+                room!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
             } else {
                 o.writeByte(0)
                 o.writeInt(site)
                 o.writeString(registerPlayerId!!)
                 o.writeIsString(null)
-                relayRoom!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
+                room!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
             }
 
             sendPackageToHOST(cachePacket!!)
-            connectionAgreement.add(relayRoom!!.groupNet)
+            connectionAgreement.add(room!!.groupNet)
             sendPacket(
-                    NetStaticData.RwHps.abstractNetPacket.getChatMessagePacket(
-                            Data.i18NBundle.getinput("relay", Data.configRelay.mainID + relayRoom!!.id), "RELAY_CN-ADMIN", 5
+                    rwHps.abstractNetPacket.getChatMessagePacket(
+                            Data.i18NBundle.getinput("relay", Data.configRelay.mainID + room!!.id), "RELAY_CN-ADMIN", 5
                     )
             )
-            this.relayRoom!!.setAddSize()
+            this.room!!.setAddSize()
         } catch (e: Exception) {
             permissionStatus = RelayStatus.CertifiedEnd
 
-            connectionAgreement.remove(relayRoom!!.groupNet)
+            connectionAgreement.remove(room!!.groupNet)
 
             error("[Relay] addRelayConnect", e)
 
@@ -500,7 +495,7 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
             }
         } else if (permissionStatus.ordinal >= RelayStatus.PlayerPermission.ordinal) {
             if (permissionStatus == RelayStatus.PlayerPermission) {
-                if (!relayRoom!!.isStartGame && relayRoom!!.abstractNetConnectIntMap.find { _, player ->
+                if (!room!!.isStartGame && room!!.abstractNetConnectIntMap.find { _, player ->
                         /**
                          * 通过检测房间已有的 UUID-Hex, 来激进的解决一些问题
                          *
@@ -519,21 +514,21 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
 
                 // Relay-EX
                 if (playerRelay == null) {
-                    playerRelay = relayRoom!!.relayPlayersData[registerPlayerId] ?: PlayerRelay(this, registerPlayerId!!, name).also {
-                        relayRoom!!.relayPlayersData[registerPlayerId!!] = it
+                    playerRelay = room!!.relayPlayersData[registerPlayerId] ?: PlayerRelay(this, registerPlayerId!!, name).also {
+                        room!!.relayPlayersData[registerPlayerId!!] = it
                     }
                     playerRelay!!.nowName = name
                     playerRelay!!.disconnect = false
                     playerRelay!!.con = this
                 }
 
-                if (relayRoom!!.relayKickData.containsKey("BAN$ip")) {
+                if (room!!.relayKickData.containsKey("BAN$ip")) {
                     kick("[BAN] 您被这个房间BAN了 请换一个房间")
                     return
                 }
 
-                val time: Int? = relayRoom!!.relayKickData["KICK$registerPlayerId"].ifNullResult(
-                        relayRoom!!.relayKickData["KICK${connectionAgreement.ipLong24}"]
+                val time: Int? = room!!.relayKickData["KICK$registerPlayerId"].ifNullResult(
+                        room!!.relayKickData["KICK${connectionAgreement.ipLong24}"]
                 ) { null }
 
                 if (time != null) {
@@ -541,13 +536,13 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
                         kick("[踢出等待] 您被这个房间踢出了 请稍等一段时间 或者换一个房间")
                         return
                     } else {
-                        relayRoom!!.relayKickData.remove("KICK$registerPlayerId")
-                        relayRoom!!.relayKickData.remove("KICK${connectionAgreement.ipLong24}")
+                        room!!.relayKickData.remove("KICK$registerPlayerId")
+                        room!!.relayKickData.remove("KICK${connectionAgreement.ipLong24}")
                     }
                 }
 
-                if (relayRoom!!.isStartGame) {
-                    if (!relayRoom!!.syncFlag) {
+                if (room!!.isStartGame) {
+                    if (!room!!.syncFlag) {
                         kick("[Sync Lock] 这个房间拒绝重连")
                         return
                     }
@@ -555,18 +550,18 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
                     if (playerRelay!!.playerSyncCount.checkStatus()) {
                         playerRelay!!.playerSyncCount.count++
                     } else {
-                        relayRoom!!.relayKickData["KICK$registerPlayerId"] = 300
+                        room!!.relayKickData["KICK$registerPlayerId"] = 300
                         kick("[同步检测] 您同步次数太多 请稍等一段时间 或者换一个房间")
                         return
                     }
                 }
             }
 
-            if (relayRoom!!.isStartGame) {
-                if (relayRoom!!.replacePlayerHex != "") {
-                    replacePlayerHex = relayRoom!!.replacePlayerHex
-                    relayRoom!!.replacePlayerHex = ""
-                    relayRoom!!.sendMsg("玩家 $name, 取代了旧玩家")
+            if (room!!.isStartGame) {
+                if (room!!.replacePlayerHex != "") {
+                    replacePlayerHex = room!!.replacePlayerHex
+                    room!!.replacePlayerHex = ""
+                    room!!.sendMsg("玩家 $name, 取代了旧玩家")
                 }
                 if (replacePlayerHex != "") {
                     val out = GameOutputStream()
@@ -601,22 +596,22 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
                 // User UUID
                 o.writeIsString(registerPlayerId!!)
                 o.writeIsString(ip)
-                relayRoom!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
+                room!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
             } else {
                 o.writeByte(0)
                 o.writeInt(site)
                 o.writeString(registerPlayerId!!)
                 o.writeIsString(registerPlayerId!!)
-                relayRoom!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
+                room!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
             }
-            relayRoom!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
+            room!!.admin!!.sendPacket(o.createPacket(PacketType.FORWARD_CLIENT_ADD))
             val o1 = GameOutputStream()
             o1.writeInt(site)
             o1.writeInt(cachePacket!!.bytes.size + 8)
             o1.writeInt(cachePacket!!.bytes.size)
             o1.writeInt(160)
             o1.writeBytes(cachePacket!!.bytes)
-            relayRoom!!.admin!!.sendPacket(o1.createPacket(PacketType.PACKET_FORWARD_CLIENT_FROM))
+            room!!.admin!!.sendPacket(o1.createPacket(PacketType.PACKET_FORWARD_CLIENT_FROM))
         } catch (e: IOException) {
             e.printStackTrace()
         } finally {
@@ -632,7 +627,7 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
                 val type = inStream.readInt()
                 val bytes = inStream.readStreamBytes()
 
-                val abstractNetConnect = relayRoom!!.getAbstractNetConnect(target)
+                val abstractNetConnect = room!!.getAbstractNetConnect(target)
 
                 Packet(type, bytes).let { sendPacketData ->
                     abstractNetConnect?.sendPacket(sendPacketData)
@@ -652,7 +647,7 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
             o.writeInt(packet.bytes.size)
             o.writeBytes(packet.type.typeIntBytes)
             o.writeBytes(packet.bytes)
-            relayRoom!!.admin?.sendPacket(o.createPacket(PacketType.PACKET_FORWARD_CLIENT_FROM))
+            room!!.admin?.sendPacket(o.createPacket(PacketType.PACKET_FORWARD_CLIENT_FROM))
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -689,45 +684,42 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
         connectReceiveData.receiveBigPacket = false
 
         if (permissionStatus.ordinal >= RelayStatus.PlayerPermission.ordinal) {
-            relayRoom!!.setRemoveSize()
+            room!!.setRemoveSize()
 
             // 避免多个玩家断开导致 NPE
-            synchronized(relayRoom!!) {
+            synchronized(room!!) {
                 try {
                     if (permissionStatus == RelayStatus.HostPermission) {
                         RelayRoom.serverRelayIpData.remove(ip)
-                        // 房间开始游戏 或者 在列表
-                        if (relayRoom!!.isStartGame) {
-                            if (relayRoom!!.getSize() > 0) {
+                        if (room!!.getSize() > 0) {
                                 // Move Room Admin
                                 adminMoveNew()
-                            }
                         } else {
                             // Close Room
-                            relayRoom!!.re()
+                            room!!.re()
                         }
                     } else {
-                        relayRoom!!.removeAbstractNetConnect(site)
+                        room!!.removeAbstractNetConnect(site)
 
                         // 解决一些问题, 让 HOST 删掉无用转发ID
                         relayPlayerDisconnect()
 
                         if (permissionStatus >= RelayStatus.PlayerJoinPermission) {
-                            if (!relayRoom!!.isStartGame) {
-                                relayRoom!!.relayPlayersData.remove(registerPlayerId)
+                            if (!room!!.isStartGame) {
+                                room!!.relayPlayersData.remove(registerPlayerId)
                             }
                         }
                     }
                 } catch (e: Exception) {
-                    if (!relayRoom!!.closeRoom) {
+                    if (!room!!.closeRoom) {
                         debug("[Relay Close Error]", e)
                     }
                 }
-                if ((relayRoom!!.getSize() <= 0 && !relayRoom!!.closeRoom)) {
+                if ((room!!.getSize() <= 0 && !room!!.closeRoom)) {
                     debug("[Relay] Game over")
-                    relayRoom!!.re()
+                    room!!.re()
                 }
-                super.close(relayRoom!!.groupNet)
+                super.close(room!!.groupNet)
             }
         } else {
             super.close(null)
@@ -737,29 +729,29 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
     open fun sendPacketExtractInformation(packet: Packet, abstractNetConnect: GameVersionRelay?) {
         when (packet.type) {
             PacketType.TEAM_LIST -> {
-                if (!relayRoom!!.isStartGame) {
+                if (!room!!.isStartGame) {
                     abstractNetConnect?.let {
                         UniversalAnalysisOfGamePackages.getPacketTeamData(GameInputStream(packet.bytes, it.clientVersion), it.playerRelay!!)
                     }
                 }
-                if (abstractNetConnect != null && abstractNetConnect.startGameFlag && site == -2 && relayRoom!!.gamePacket.startGamePacket != null) {
-                    abstractNetConnect.sendPacket(relayRoom!!.gamePacket.startGamePacket!!)
+                if (abstractNetConnect != null && abstractNetConnect.startGameFlag && site == -2 && room!!.gamePacket.startGamePacket != null) {
+                    abstractNetConnect.sendPacket(room!!.gamePacket.startGamePacket!!)
                     abstractNetConnect.startGameFlag = false
                 }
             }
             PacketType.RETURN_TO_BATTLEROOM -> {
-                if (relayRoom!!.isStartGame) {
-                    relayRoom!!.isStartGame = false
-                    relayRoom!!.gamePacket.startGamePacket = null
+                if (room!!.isStartGame) {
+                    room!!.isStartGame = false
+                    room!!.gamePacket.startGamePacket = null
                 }
             }
             PacketType.START_GAME -> {
-                relayRoom!!.isStartGame = true
-                if (site == -1 && relayRoom!!.gamePacket.startGamePacket == null) {
+                room!!.isStartGame = true
+                if (site == -1 && room!!.gamePacket.startGamePacket == null) {
                     GameInputStream(packet).use {
                         it.skip(1)
                         if (it.readInt() != 0) {
-                            relayRoom!!.gamePacket.startGamePacket = packet
+                            room!!.gamePacket.startGamePacket = packet
                         }
                     }
                 }
@@ -903,10 +895,9 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
             }
 
             newRelayId(customId, mod = mods, customRelayData = custom)
-
             if (custom.maxPlayerSize != -1 || custom.maxUnitSizt != 200) {
                 sendPacket(
-                        NetStaticData.RwHps.abstractNetPacket.getChatMessagePacket(
+                        rwHps.abstractNetPacket.getChatMessagePacket(
                                 "自定义人数: ${custom.maxPlayerSize} 自定义单位: ${custom.maxUnitSizt}", "RELAY_CN-Custom", 5
                         )
                 )
@@ -917,8 +908,8 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
                     sendRelayServerType(Data.i18NBundle.getinput("relay.server.error", "不能包含 [ . ]"))
                     return
                 }
-                relayRoom = RelayRoom.getRelay(id)
-                if (relayRoom != null) {
+                room = RelayRoom.getRelay(id)
+                if (room != null) {
                     addRelayConnect()
                 } else {
                     sendRelayServerType(Data.i18NBundle.getinput("relay.server.no", id))
@@ -948,19 +939,19 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
 
     private fun adminMoveNew() {
         // 更新最小玩家
-        relayRoom!!.updateMinSize()
-        relayRoom!!.getAbstractNetConnect(relayRoom!!.minSize)?.let {
+        room!!.updateMinSize()
+        room!!.getAbstractNetConnect(room!!.minSize)?.let {
             it.sendRelayServerId()
-            relayRoom!!.abstractNetConnectIntMap.values.forEach { obj: GameVersionRelay -> obj.addReRelayConnect() }
+            room!!.abstractNetConnectIntMap.values.forEach { obj: GameVersionRelay -> obj.addReRelayConnect() }
             this.addReRelayConnect()
-            sendPackageToHOST(NetStaticData.RwHps.abstractNetPacket.getExitPacket())
+            sendPackageToHOST(rwHps.abstractNetPacket.getExitPacket())
         }
     }
 
     private fun newRelayId(id: String? = null, mod: Boolean, customRelayData: CustomRelayData = CustomRelayData()) {
         val maxPlayer = if (customRelayData.maxPlayerSize == -1) 10 else customRelayData.maxPlayerSize
 
-        relayRoom = if (IsUtils.isBlank(id)) {
+        room = if (IsUtils.isBlank(id)) {
             RelayRoom.getRelay(
                     playerName = name, isMod = mod, betaGameVersion = betaGameVersion, version = clientVersion, maxPlayer = maxPlayer
             )
@@ -968,14 +959,14 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
             RelayRoom.getRelay(id!!, name, mod, betaGameVersion, clientVersion, maxPlayer)
         }
 
-        relayRoom!!.isMod = mod
+        room!!.isMod = mod
 
         if (customRelayData.maxPlayerSize != -1 || customRelayData.income != 1F) {
             customModePlayerSize(customRelayData)
         }
 
         sendRelayServerId()
-        relayRoom!!.setAddSize()
+        room!!.setAddSize()
     }
 
     private fun customModePlayerSize(customRelayData: CustomRelayData) {
@@ -985,7 +976,7 @@ open class GameVersionRelay(connectionAgreement: ConnectionAgreement): AbstractN
         registerServer.writeInt(clientVersion)
         registerServer.writeInt(clientVersion)
         registerServer.writeString("com.corrodinggames.rts.server")
-        registerServer.writeString(relayRoom!!.serverUuid)
+        registerServer.writeString(room!!.serverUuid)
         registerServer.writeInt("Dr @ 2022".hashCode())
         sendPacket(registerServer.createPacket(PacketType.PREREGISTER_INFO))
 

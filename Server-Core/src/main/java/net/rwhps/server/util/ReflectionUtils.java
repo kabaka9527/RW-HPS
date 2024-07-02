@@ -47,6 +47,8 @@ public abstract class ReflectionUtils {
      */
     private static final String CGLIB_RENAMED_METHOD_PREFIX = "CGLIB$";
 
+    private static final Class[] EMPTY_CLASS_ARRAY = new Class[0];
+
     private static final Method[] EMPTY_METHOD_ARRAY = new Method[0];
 
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
@@ -306,6 +308,10 @@ public abstract class ReflectionUtils {
         }
     }
 
+    public static void doWithClasss(Class<?> clazz, ClassCallback mc) {
+        doWithClasss(clazz, mc, null);
+    }
+
     /**
      * Perform the given callback operation on all matching methods of the given
      * class and superclasses.
@@ -320,6 +326,24 @@ public abstract class ReflectionUtils {
     public static void doWithMethods(Class<?> clazz, MethodCallback mc) {
         doWithMethods(clazz, mc, null);
     }
+
+    public static void doWithClasss(Class<?> clazz, ClassCallback mc, @Nullable MethodFilter mf) {
+        try {
+            mc.doWith(clazz);
+        } catch (IllegalAccessException ex) {
+            throw new IllegalStateException("Not allowed to access class '" + clazz.getName() + "': " + ex);
+        }
+
+
+        for (Class<?> superIfc : clazz.getInterfaces()) {
+            doWithClasss(superIfc, mc, mf);
+        }
+
+        if (clazz.getSuperclass() != null) {
+            doWithClasss(clazz.getSuperclass(), mc, mf);
+        }
+    }
+
 
     /**
      * Perform the given callback operation on all matching methods of the given
@@ -352,6 +376,12 @@ public abstract class ReflectionUtils {
                 doWithMethods(superIfc, mc, mf);
             }
         }
+    }
+
+    public static Class[] getAllDeclaredClass(Class<?> leafClass) {
+        final List<Class> classs = new ArrayList<>(32);
+        doWithClasss(leafClass, classs::add);
+        return classs.toArray(EMPTY_CLASS_ARRAY);
     }
 
     /**
@@ -767,6 +797,20 @@ public abstract class ReflectionUtils {
     public static void clearCache() {
         declaredMethodsCache.clear();
         declaredFieldsCache.clear();
+    }
+
+    /**
+     * Action to take on each method.
+     */
+    @FunctionalInterface
+    public interface ClassCallback {
+
+        /**
+         * Perform an operation using the given class.
+         *
+         * @param cls the Class to operate on
+         */
+        void doWith(Class cls) throws IllegalArgumentException, IllegalAccessException;
     }
 
 

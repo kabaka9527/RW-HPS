@@ -14,7 +14,7 @@ import net.rwhps.server.game.enums.GameUnitActions
 import net.rwhps.server.game.manage.HeadlessModuleManage
 import net.rwhps.server.game.player.PlayerHess
 import net.rwhps.server.io.GameInputStream
-import net.rwhps.server.io.packet.block.OperationUnitPacket
+import net.rwhps.server.io.packet.block.GameCommandBlockOperationUnitPacket
 import net.rwhps.server.struct.list.Seq
 
 /**
@@ -25,7 +25,7 @@ import net.rwhps.server.struct.list.Seq
  */
 class GameCommandOnePacket(bytes: ByteArray) {
     val sendBy: PlayerHess?
-    var operationUnit: OperationUnitPacket? = null
+    var operationUnit: GameCommandBlockOperationUnitPacket? = null
     val N_Boolean_1: Boolean
     val N_Boolean_2: Boolean
     val N_Int_1: Int
@@ -54,7 +54,7 @@ class GameCommandOnePacket(bytes: ByteArray) {
             }
             // 建造移动等
             if (it.readBoolean()) {
-                operationUnit = OperationUnitPacket(it)
+                operationUnit = GameCommandBlockOperationUnitPacket(it)
             }
             N_Boolean_1 = it.readBoolean()
             N_Boolean_2 = it.readBoolean()

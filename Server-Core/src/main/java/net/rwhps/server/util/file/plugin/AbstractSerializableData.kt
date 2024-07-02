@@ -15,6 +15,7 @@ import net.rwhps.server.util.file.plugin.serializer.AbstractSerializers
 import net.rwhps.server.util.file.plugin.value.DelegatedValue
 import net.rwhps.server.util.file.plugin.value.SerializableValue
 import net.rwhps.server.util.file.plugin.value.Value
+import net.rwhps.server.util.kotlin.JavaKotlinFix
 import net.rwhps.server.util.kotlin.ProvideDelegate
 import net.rwhps.server.util.log.Log.error
 import net.rwhps.server.util.log.exp.VariableException
@@ -37,7 +38,7 @@ open class AbstractSerializableData(
     private val pluginData = OrderedMap<String, Value<*>>()
     private var fileUtils: FileUtils? = null
 
-    fun setFileUtil(fileUtils: FileUtils) {
+    open fun setFileUtil(fileUtils: FileUtils, autoSave: Boolean = true) {
         this.fileUtils = fileUtils
         fileUtils.createNewFile()
         this.read()
@@ -82,7 +83,7 @@ open class AbstractSerializableData(
      */
     @Suppress("UNCHECKED_CAST", "NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
     inline operator fun <reified T> set(name: String, data: T) {
-        if (serializers.checkContainsSerializers(T::class.java)) {
+        if (serializers.checkContainsSerializers(JavaKotlinFix.className(T::class.java))) {
             (pluginData[name, { SerializableValue(data) }] as SerializableValue<T>).value = data
         } else {
             throw VariableException.ObjectMapRuntimeException("${T::class.java} : UNSUPPORTED_SERIALIZATION")

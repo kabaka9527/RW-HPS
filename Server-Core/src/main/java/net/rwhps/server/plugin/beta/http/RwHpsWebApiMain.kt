@@ -9,8 +9,6 @@
 
 package net.rwhps.server.plugin.beta.http
 
-import net.rwhps.server.data.bean.internal.BeanPluginInfo
-import net.rwhps.server.data.global.Data
 import net.rwhps.server.game.event.EventGlobalManage
 import net.rwhps.server.game.event.EventManage
 import net.rwhps.server.game.event.core.EventListenerHost
@@ -49,15 +47,6 @@ class RwHpsWebApiMain: Plugin() {
     }
 
     companion object {
-        internal val pluginInfo = BeanPluginInfo(
-                name = "RW-HPS API",
-                internalName = "HTTPAPI",
-                author = "Dr (dr@der.kim)",
-                description = "API interface for RW-HPS",
-                version = "0.0.2",
-                supportedVersions = "= ${Data.SERVER_CORE_VERSION}"
-        )
-
         const val name = "HttpApi"
         const val cookieName = "HttpApi-Authentication"
     }

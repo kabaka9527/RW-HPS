@@ -10,16 +10,10 @@
 package net.rwhps.server.data.bean
 
 import net.rwhps.server.data.global.Data
-import net.rwhps.server.struct.list.Seq
-import net.rwhps.server.util.ReflectionUtils
 import net.rwhps.server.util.SystemUtils
 import net.rwhps.server.util.file.FileUtils
 import net.rwhps.server.util.inline.toGson
-import net.rwhps.server.util.inline.toPrettyPrintingJson
-import net.rwhps.server.util.log.Log.debug
-import net.rwhps.server.util.log.Log.error
 import net.rwhps.server.util.math.RandomUtils
-import java.lang.reflect.Field
 
 
 /**
@@ -85,32 +79,12 @@ data class BeanCoreConfig(
     val sslPasswd: String = "RW-HPS",
 
     var runPid: Long = 0
+): AbstractBeanConfig(
+        this::class.java, "rwhps.config.core"
 ) {
-    fun save() {
+    override fun save() {
         runPid = SystemUtils.pid
-        fileUtils.writeFile(this.toPrettyPrintingJson())
-    }
-
-    fun coverField(name: String, value: Any): Boolean {
-        try {
-            val field: Field = ReflectionUtils.findField(this::class.java, name) ?: return false
-            field.isAccessible = true
-            field[this] = value
-            field.isAccessible = false
-        } catch (e: Exception) {
-            error("Cover Gameover error", e)
-        }
-        return true
-    }
-
-    private fun allName(): Seq<String> {
-        val allName = Seq<String>()
-        val fields = this.javaClass.declaredFields
-        for (field in fields) {
-            // 过滤Kt生成的和不能被覆盖的
-            if (field.name != "Companion" && field.name != "fileUtil") allName.add(field.name)
-        }
-        return allName
+        super.save()
     }
 
     companion object {
@@ -120,19 +94,8 @@ data class BeanCoreConfig(
         fun stringToClass(): BeanCoreConfig {
 
             val config: BeanCoreConfig = BeanCoreConfig::class.java.toGson(fileUtils.readFileStringData())
-
-            // PATH
-            config.allName().eachAll {
-                val data = System.getProperties().getProperty("rwhps.config.$it")
-                if (data != null) {
-                    if (config.coverField(it, data)) {
-                        debug("Set OK $it = $data")
-                    } else {
-                        debug("Set ERROR $it = $data")
-                    }
-                }
-            }
-
+            config.bindFile(fileUtils)
+            config.readProperty()
             return config
         }
     }

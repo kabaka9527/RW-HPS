@@ -95,7 +95,7 @@ object GameStartInit {
                 //load.addClassBytes("com.corrodinggames.rts.gameFramework.c", CommandArrayListCoverSyncList.build(), true)
 
                 //TODO Save GameModularReusableClass
-                load.saveData(FileUtils.getFolder(Data.ServerDataPath).toFile("GameModularReusableClass.bin"))
+                //load.saveData(FileUtils.getFolder(Data.ServerDataPath).toFile("GameModularReusableClass.bin"))
             }
         } catch (e: Exception) {
             Log.fatal(e)

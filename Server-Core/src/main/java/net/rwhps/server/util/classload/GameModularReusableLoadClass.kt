@@ -44,7 +44,7 @@ class GameModularReusableLoadClass(
     fun readData(file: FileUtils) {
         val serializers = SerializersEnum.Bin.create().apply { (this as MachineFriendlySerializers).code = CompressionAlgorithm.SevenZip }
         val data = PluginData(serializers).apply {
-            setFileUtil(file)
+            setFileUtil(file, false)
         }
 
         this.classPathMapData.clear()

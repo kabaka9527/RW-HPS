@@ -18,8 +18,11 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-val gsonToString: Gson = GsonBuilder().setPrettyPrinting().create()
-val gsonToStringNoPrettyPrinting: Gson = GsonBuilder().create()
+val gsonToString: Gson = GsonBuilder()
+    .setPrettyPrinting()
+    .create()
+val gsonToStringNoPrettyPrinting: Gson = GsonBuilder()
+    .create()
 val stringToGson: Gson = Gson()
 
 fun Any.toJson(): String {

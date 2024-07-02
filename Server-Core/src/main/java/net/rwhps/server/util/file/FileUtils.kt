@@ -9,7 +9,6 @@
 
 package net.rwhps.server.util.file
 
-import net.rwhps.server.core.Core
 import net.rwhps.server.data.global.Data
 import net.rwhps.server.struct.list.Seq
 import net.rwhps.server.struct.map.OrderedMap
@@ -244,7 +243,6 @@ open class FileUtils {
             }
         } catch (e: Exception) {
             error("writeByteFile", e)
-            Core.exit()
         }
     }
 

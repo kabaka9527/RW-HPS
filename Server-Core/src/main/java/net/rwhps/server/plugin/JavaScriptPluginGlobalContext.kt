@@ -10,6 +10,7 @@
 package net.rwhps.server.plugin
 
 import net.rwhps.server.data.bean.internal.BeanPluginInfo
+import net.rwhps.server.data.global.Data
 import net.rwhps.server.func.ConsMap
 import net.rwhps.server.func.ConsSeq
 import net.rwhps.server.func.Prov
@@ -24,8 +25,8 @@ import net.rwhps.server.io.output.CompressOutputStream
 import net.rwhps.server.io.output.DisableSyncByteArrayOutputStream
 import net.rwhps.server.io.output.DynamicPrintStream
 import net.rwhps.server.io.packet.Packet
+import net.rwhps.server.io.packet.type.PacketType
 import net.rwhps.server.net.GroupNet
-import net.rwhps.server.net.manage.HttpRequestManage
 import net.rwhps.server.net.core.ConnectionAgreement
 import net.rwhps.server.net.core.DataPermissionStatus
 import net.rwhps.server.net.core.IRwHps
@@ -34,7 +35,6 @@ import net.rwhps.server.struct.list.Seq
 import net.rwhps.server.struct.map.IntMap
 import net.rwhps.server.struct.map.ObjectMap
 import net.rwhps.server.struct.map.OrderedMap
-import net.rwhps.server.io.packet.type.PacketType
 import net.rwhps.server.util.compression.core.AbstractDecoder
 import net.rwhps.server.util.file.FakeFileSystem
 import net.rwhps.server.util.file.FileUtils
@@ -363,7 +363,7 @@ internal class JavaScriptPluginGlobalContext {
                         if (webRes != null) {
                             val list = webRes.groupValues
                             val uri = "${list[1]}://${list[2]}${list[3].removePrefix("/")}${list[4].removePrefix("/")}"
-                            HttpRequestManage.doGet(uri).toByteArray()
+                            Data.core.http.doGet(uri).toByteArray()
                         } else {
                             null
                         }

@@ -18,16 +18,21 @@ import io.netty.channel.epoll.EpollEventLoopGroup
 import io.netty.channel.epoll.EpollServerSocketChannel
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
+import net.rwhps.server.data.global.Cache
 import net.rwhps.server.data.global.Data
 import net.rwhps.server.data.global.NetStaticData
+import net.rwhps.server.game.manage.IRwHpsManage
 import net.rwhps.server.net.core.AbstractNet
+import net.rwhps.server.net.core.IRwHps
+import net.rwhps.server.net.core.IRwHps.NetType.*
 import net.rwhps.server.net.core.web.AbstractNetWeb
 import net.rwhps.server.net.handler.tcp.StartGameNetTcp
 import net.rwhps.server.net.handler.tcp.StartHttp
 import net.rwhps.server.net.handler.tcp.StartMixProtocol
+import net.rwhps.server.net.handler.tcp.StartRemoteControl
 import net.rwhps.server.net.http.WebData
 import net.rwhps.server.struct.list.Seq
-import net.rwhps.server.util.ReflectionUtils
+import net.rwhps.server.struct.map.ObjectMap
 import net.rwhps.server.util.concurrent.threads.GetNewThreadPool.getEventLoopGroup
 import net.rwhps.server.util.internal.net.rudp.ReliableServerSocket
 import net.rwhps.server.util.log.Log.clog
@@ -53,16 +58,38 @@ class NetService {
     /** 工作线程数 */
     var workThreadCount = 0
 
-    constructor(id: String, abstractNetClass: Class<out AbstractNet>) : this(
-            id,
-            requireNotNull(ReflectionUtils.accessibleConstructor(abstractNetClass).newInstance())
-    )
+    constructor(id: String, rwHps: IRwHps) {
+        require(rwHps.netType != NullProtocol) {
+            "No find Protocol"
+        }
 
-    @JvmOverloads
-    constructor(id: String, abstractNet: AbstractNet = if (Data.config.mixProtocolEnable) StartMixProtocol() else StartGameNetTcp()) {
+        val abstractNet =
+            if (Data.config.mixProtocolEnable) {
+                val map = ObjectMap<IRwHps.NetType, IRwHps>().apply {
+                    put(GameProtocol, rwHps)
+                    put(RemoteControlProtocol, Cache.iRwHpsCache["MixRemoteControl", { IRwHpsManage.addIRwHps(RemoteControlProtocol, "MixRemoteControlDef") }])
+                    put(HttpProtocol, Cache.iRwHpsCache["MixHttp", { IRwHpsManage.addIRwHps(HttpProtocol, "MixHttpDef") }])
+                }
+                StartMixProtocol(map)
+            } else {
+                if (NetStaticData.checkProtocolIsServer(rwHps.netType)) {
+                    StartGameNetTcp(rwHps)
+                } else {
+                    when (rwHps.netType) {
+                        DedicatedToTheBackend -> StartGameNetTcp(rwHps)
+                        HttpProtocol -> StartHttp(rwHps)
+                        RemoteControlProtocol -> StartRemoteControl(rwHps)
+                        GlobalProtocol -> TODO()
+                        else -> TODO()
+                    }
+
+                }
+        }
+
         this.netType = when (abstractNet) {
             is StartGameNetTcp -> NetTypeEnum.HeadlessNet
             is StartMixProtocol -> NetTypeEnum.MixTlsAndGame
+            is StartRemoteControl -> NetTypeEnum.RemoteControl
             is StartHttp -> NetTypeEnum.HTTPNet
             is AbstractNetWeb -> NetTypeEnum.HTTPNet
             else -> NetTypeEnum.Other
@@ -241,6 +268,7 @@ class NetService {
 
         enum class NetTypeEnum {
             HeadlessNet,
+            RemoteControl,
             HTTPNet,
             MixTlsAndGame,
             Other

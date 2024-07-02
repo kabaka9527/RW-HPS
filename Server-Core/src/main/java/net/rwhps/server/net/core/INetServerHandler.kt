@@ -10,6 +10,7 @@
 package net.rwhps.server.net.core
 
 import io.netty.channel.ChannelHandler
+import io.netty.channel.ChannelInboundHandler
 import io.netty.channel.SimpleChannelInboundHandler
 
 /**
@@ -21,4 +22,4 @@ import io.netty.channel.SimpleChannelInboundHandler
 @ChannelHandler.Sharable
 abstract class INetServerHandler(
         protected val abstractNet: AbstractNet
-) : SimpleChannelInboundHandler<Any?>()
+) : SimpleChannelInboundHandler<Any?>(), ChannelInboundHandler

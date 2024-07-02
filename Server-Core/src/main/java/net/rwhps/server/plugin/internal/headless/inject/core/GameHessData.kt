@@ -140,6 +140,6 @@ internal class GameHessData: AbstractGameHessData {
     }
 
     override fun getHeadlessAIServer(): AbstractNetConnectServer {
-        return GameVersionServer(PlayerConnectX(GameEngine.netEngine, ConnectionAgreement(true)))
+        return GameVersionServer(PlayerConnectX(GameEngine.netEngine, ConnectionAgreement(GameEngine.iRwHps!!)))
     }
 }

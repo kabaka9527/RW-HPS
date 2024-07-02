@@ -10,13 +10,10 @@
 package net.rwhps.server.data.bean
 
 import net.rwhps.server.data.global.Data
-import net.rwhps.server.struct.list.Seq
-import net.rwhps.server.util.ReflectionUtils
 import net.rwhps.server.util.file.FileUtils
 import net.rwhps.server.util.inline.toGson
-import net.rwhps.server.util.inline.toPrettyPrintingJson
 import net.rwhps.server.util.log.Log
-import java.lang.reflect.Field
+import net.rwhps.server.util.math.RandomUtils
 
 /**
  * Server-Protocol configuration file
@@ -25,6 +22,9 @@ import java.lang.reflect.Field
  * @author Dr (dr@der.kim)
  */
 data class BeanServerConfig(
+    /** 服务器ID, 作为后续 mods/maps/save 文件区分 */
+    val serverID: String = RandomUtils.getRandomIetterString(5),
+
     val enterAd: String = "",
     val startAd: String = "",
     val maxPlayerJoinAd: String = "",
@@ -56,6 +56,10 @@ data class BeanServerConfig(
     val maxUnit: Int = 200,
     /** 默认倍率 */
     val defIncome: Float = 1f,
+
+    val isAfk: Boolean = true,
+    val muteAll: Boolean = false,
+
     /** 点石成金 */
     val turnStoneIntoGold: Boolean = false,
 
@@ -65,6 +69,8 @@ data class BeanServerConfig(
     /** 是否保存 RePlay */
     val saveRePlayFile: Boolean = true,
     /***/
+): AbstractBeanConfig(
+        this::class.java, "rwhps.config.server"
 ) {
     private fun checkValue() {
         // 拒绝最大玩家数超过最小开始玩家数
@@ -78,53 +84,15 @@ data class BeanServerConfig(
         }
     }
 
-    fun save() {
-        fileUtils.writeFile(this.toPrettyPrintingJson())
-    }
-
-    fun coverField(name: String, value: Any): Boolean {
-        try {
-            val field: Field = ReflectionUtils.findField(this::class.java, name) ?: return false
-            field.isAccessible = true
-            field[this] = value
-            field.isAccessible = false
-        } catch (e: Exception) {
-            Log.error("Cover $name error", e)
-        }
-        return true
-    }
-
-    private fun allName(): Seq<String> {
-        val allName = Seq<String>()
-        val fields = this.javaClass.declaredFields
-        for (field in fields) {
-            // 过滤Kt生成的和不能被覆盖的
-            if (field.name != "Companion" && field.name != "fileUtil") allName.add(field.name)
-        }
-        return allName
-    }
-
     companion object {
         val fileUtils = FileUtils.getFolder(Data.ServerDataPath).toFile("ConfigServer.json")
 
         @JvmStatic
         fun stringToClass(): BeanServerConfig {
             val config: BeanServerConfig = BeanServerConfig::class.java.toGson(fileUtils.readFileStringData())
-
-            // PATH
-            config.allName().eachAll {
-                val data = System.getProperties().getProperty("rwhps.server.config.$it")
-                if (data != null) {
-                    if (config.coverField(it, data)) {
-                        Log.debug("Set OK $it = $data")
-                    } else {
-                        Log.debug("Set ERROR $it = $data")
-                    }
-                }
-            }
-
+            config.bindFile(fileUtils)
+            config.readProperty()
             config.checkValue()
-
             return config
         }
     }

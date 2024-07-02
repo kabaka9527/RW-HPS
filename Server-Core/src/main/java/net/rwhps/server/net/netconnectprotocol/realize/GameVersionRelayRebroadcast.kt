@@ -62,7 +62,7 @@ class GameVersionRelayRebroadcast(connectionAgreement: ConnectionAgreement): Gam
                 val type = inStream.readInt()
                 val bytes = inStream.readStreamBytes()
 
-                val abstractNetConnect = relayRoom!!.getAbstractNetConnect(target)
+                val abstractNetConnect = room!!.getAbstractNetConnect(target)
 
                 Packet(type, bytes).let { sendPacketData ->
                     lastSentPacket = sendPacketData
@@ -80,7 +80,7 @@ class GameVersionRelayRebroadcast(connectionAgreement: ConnectionAgreement): Gam
         try {
             GameInputStream(packet).use { stream ->
                 val target = stream.readInt()
-                relayRoom!!.getAbstractNetConnect(target)?.sendPacket(lastSentPacket)
+                room!!.getAbstractNetConnect(target)?.sendPacket(lastSentPacket)
             }
         } catch (_: IOException) {/* 忽略 */
         }

@@ -10,18 +10,11 @@
 package net.rwhps.server.util.log
 
 import net.rwhps.server.data.global.Data
-import net.rwhps.server.game.event.global.ServerConsolePrintEvent
-import net.rwhps.server.util.Time.getMilliFormat
-import net.rwhps.server.util.file.FileUtils
-import net.rwhps.server.util.file.plugin.PluginManage
-import net.rwhps.server.util.inline.ifNullResult
-import net.rwhps.server.util.log.ColorCodes.formatColors
-import net.rwhps.server.util.log.exp.ExceptionX
-import java.io.FileOutputStream
+import net.rwhps.server.util.str.Parser.parseLog
 import java.text.MessageFormat
 
 /**
- * Log Util
+ * Log 接口
  *
  * 在这里实现 RW-HPS 的主要输出
  *
@@ -34,11 +27,7 @@ import java.text.MessageFormat
  * @version 1.1
  */
 @Suppress("UNUSED")
-object Log {
-    /** 默认 WARN  */
-    private var LOG_GRADE = 5
-    private val outLog: FileOutputStream
-
+object Log: LogCore() {
     /** 默认错误捕获器 */
     val errorDispose = Thread.UncaughtExceptionHandler { thread, error ->
         if (thread != null) {
@@ -49,9 +38,6 @@ object Log {
     }
 
     init {
-        val logLogFile = FileUtils.getFolder(Data.ServerLogPath).toFile("Log.txt")
-        outLog = logLogFile.writeByteOutputStream(logLogFile.file.length() <= 512 * 1024)
-
         // 设置默认的线程异常捕获处理器
         Thread.setDefaultUncaughtExceptionHandler(errorDispose)
 
@@ -60,283 +46,54 @@ object Log {
         Thread.currentThread().uncaughtExceptionHandler = errorDispose
     }
 
-    /**
-     * 设置 [Log] 级别
-     *
-     * @param log [Logg]
-     */
     @JvmStatic
-    fun set(log: String) {
-        LOG_GRADE = Logg.from(log).logg
-    }
-
-    /**
-     * Log：
-     * tag 标题 默认警告级
-     */
+    fun skipping(tag: Any) = logs(Logg.OFF, tag)
     @JvmStatic
-    fun skipping(e: Throwable) {
-        log(9, "SKIPPING", e)
-    }
+    fun skipping(tag: Any, e: Any, vararg params: Any) = logs(Logg.OFF, tag, e.parse(*params))
 
     @JvmStatic
-    fun skipping(tag: Any, e: Throwable) {
-        log(9, tag, e)
-    }
+    fun fatal(tag: Any) = logs(Logg.FATAL, tag)
+    @JvmStatic
+    fun fatal(tag: Any, e: Any, vararg params: Any) = logs(Logg.FATAL, tag, e.parse(*params))
 
     @JvmStatic
-    fun skipping(e: Any) {
-        logs(9, "SKIPPING", e)
-    }
+    fun error(tag: Any) = logs(Logg.ERROR, tag)
+    @JvmStatic
+    fun error(tag: Any, e: Any, vararg params: Any) = logs(Logg.ERROR, tag, e.parse(*params))
 
     @JvmStatic
-    fun skipping(tag: Any, e: Any) {
-        logs(9, tag, e)
-    }
+    fun warn(tag: Any) = logs(Logg.WARN, tag)
+    @JvmStatic
+    fun warn(tag: Any, e: Any, vararg params: Any) = logs(Logg.WARN, tag, e.parse(*params))
 
     @JvmStatic
-    fun fatal(e: Throwable) {
-        log(7, "FATAL", e)
-    }
+    fun info(tag: Any) = logs(Logg.INFO, tag)
+    @JvmStatic
+    fun info(tag: Any, e: Any, vararg params: Any) = logs(Logg.INFO, tag, e.parse(*params))
 
     @JvmStatic
-    fun fatal(tag: Any, e: Throwable) {
-        log(7, tag, e)
-    }
+    fun debug(tag: Any) = logs(Logg.DEBUG, tag)
+    @JvmStatic
+    fun debug(tag: Any, e: Any, vararg params: Any) = logs(Logg.DEBUG, tag, e.parse(*params))
 
     @JvmStatic
-    fun fatal(e: Any) {
-        logs(7, "FATAL", e)
-    }
+    fun track(tag: Any) = logs(Logg.TRACK, tag)
+    @JvmStatic
+    fun track(tag: Any, e: Any, vararg params: Any) = logs(Logg.TRACK, tag, e.parse(*params))
 
     @JvmStatic
-    fun fatal(tag: Any, e: Any) {
-        logs(7, tag, e)
-    }
+    fun all(tag: Any)= logs(Logg.ALL, tag)
+    @JvmStatic
+    fun all(tag: Any, e: Any, vararg params: Any)= logs(Logg.ALL, tag, e.parse(*params))
 
     @JvmStatic
-    fun error(e: Throwable) {
-        log(6, "ERROR", e)
-    }
+    fun clog(e: Any, vararg params: Any) = logs(Logg.CONSOLE, "", e.parse(*params))
 
-    @JvmStatic
-    fun error(tag: Any, e: Throwable) {
-        log(6, tag, e)
-    }
-
-    @JvmStatic
-    fun error(e: Any) {
-        logs(6, "ERROR", e)
-    }
-
-    @JvmStatic
-    fun error(tag: Any, e: Any) {
-        logs(6, tag, e)
-    }
-
-    @JvmStatic
-    fun warn(e: Throwable) {
-        log(5, "WARN", e)
-    }
-
-    @JvmStatic
-    fun warn(tag: Any, e: Throwable) {
-        log(5, tag, e)
-    }
-
-    @JvmStatic
-    fun warn(e: Any) {
-        logs(5, "WARN", e)
-    }
-
-    @JvmStatic
-    fun warn(tag: Any, e: Any) {
-        logs(5, tag, e)
-    }
-
-    @JvmStatic
-    fun info(e: Throwable) {
-        log(4, "INFO", e)
-    }
-
-    @JvmStatic
-    fun info(tag: Any, e: Throwable) {
-        log(4, tag, e)
-    }
-
-    @JvmStatic
-    fun info(e: Any) {
-        logs(4, "INFO", e)
-    }
-
-    @JvmStatic
-    fun info(tag: Any, e: Any) {
-        logs(4, tag, e)
-    }
-
-    @JvmStatic
-    fun debug(e: Throwable) {
-        log(3, "DEBUG", e)
-    }
-
-    @JvmStatic
-    fun debug(tag: Any, e: Throwable) {
-        log(3, tag, e)
-    }
-
-    @JvmStatic
-    fun debug(e: Any) {
-        logs(3, "DEBUG", e)
-    }
-
-    @JvmStatic
-    fun debug(tag: Any, e: Any) {
-        logs(3, tag, e)
-    }
-
-    @JvmStatic
-    fun track(e: Throwable) {
-        log(2, "TRACK", e)
-    }
-
-    @JvmStatic
-    fun track(tag: Any, e: Throwable) {
-        log(2, tag, e)
-    }
-
-    @JvmStatic
-    fun track(e: Any) {
-        logs(2, "TRACK", e)
-    }
-
-    @JvmStatic
-    fun track(tag: Any, e: Any) {
-        logs(2, tag, e)
-    }
-
-
-    @JvmStatic
-    fun all(e: Throwable) {
-        log(1, "ALL", e)
-    }
-
-    @JvmStatic
-    fun all(tag: Any, e: Throwable) {
-        log(1, tag, e)
-    }
-
-    @JvmStatic
-    fun all(e: Any) {
-        logs(1, "ALL", e)
-    }
-
-    @JvmStatic
-    fun all(tag: Any, e: Any) {
-        logs(1, tag, e)
-    }
-
-    @JvmStatic
-    fun clog(text: String) {
-        val textCache = "[" + getMilliFormat(1) + "] " + text
-        print(false, formatColors("$textCache&fr"))
-    }
-
-    @JvmStatic
-    fun clog(text: String, vararg obj: Any?) {
-        clog(MessageFormat(text).format(obj))
-    }
-
-    @JvmStatic
-    fun testPrint(`object`: Any) {
-        info(`object`)
-    }
-
-    @JvmStatic
-    fun saveLog() {
-        outLog.flush()
-    }
-
-    /**
-     * WLog：
-     * @param i Warning level -INT
-     * @param tag Title / Default warning level-String
-     * @param e Exception
-     * i>=Set the level to write to the file
-     */
-    private fun log(i: Int, tag: Any, e: Throwable) {
-        logs(i, tag, ExceptionX.resolveTrace(e), true)
-    }
-
-    private fun logs(i: Int, tag: Any, e: Any, error: Boolean = false) {
-        if (this.LOG_GRADE > i && !error) {
-            return
-        }
-
-        val sb = StringBuilder()
-        val lines = e.toString().split(Data.LINE_SEPARATOR).toTypedArray()
-        if (error) {
-            val stack = Throwable().stackTrace
-            for (ste in stack) {
-                val className = "${ste.className}.${ste.methodName}"
-                if (!className.contains("net.rwhps.server.util.log.Log")) {
-                    sb.append("[").append(ste.fileName).append("] : ").append(ste.methodName).append(" : ").append(ste.lineNumber)
-                        .append(Data.LINE_SEPARATOR)
-                    break
-                }
-            }
-        }
-
-        // [Time] Tag:
-        // Info
-        sb.append("[").append(getMilliFormat(1)).append("] ").append(tag).append(": ")
-
-        // 避免换行
-        if (lines.size > 1) {
-            sb.append(Data.LINE_SEPARATOR)
-            for (line in lines) {
-                sb.append(line).append(Data.LINE_SEPARATOR)
-            }
-            // 去掉最后的换行
-            sb.deleteCharAt(sb.length - 1)
+    private fun Any.parse(vararg params: Any): Any {
+        return if (this is String) {
+            MessageFormat(parseLog(this, *params)).format(params)
         } else {
-            sb.append(e.toString())
-        }
-
-        print(error, sb.toString())
-    }
-
-    private fun print(error: Boolean, text: String) {
-        println(text)
-
-        PluginManage.runGlobalEventManage(ServerConsolePrintEvent(text))
-
-        if (error) {
-            // Remove Color
-            var textCache = text
-            for (i in ColorCodes.VALUES.indices) {
-                textCache = textCache.replace(ColorCodes.VALUES[i], "")
-            }
-
-            outLog.write("$textCache${Data.LINE_SEPARATOR}".toByteArray())
-        }
-    }
-
-    private enum class Logg(val logg: Int) {
-        /* Log level defaults to WARN *//* ALL during development */
-        OFF(8),
-        FATAL(7),
-        ERROR(6),
-        WARN(5),
-        INFO(4),
-        DEBUG(3),
-        TRACK(2),
-        ALL(1);
-
-        companion object {
-            fun from(type: String): Logg = entries.find { it.name == type || it.name.lowercase() == type.lowercase() }.ifNullResult({
-                skipping("Log Level Set Error , In: $type")
-                ALL
-            }) { it }
+            this
         }
     }
 }

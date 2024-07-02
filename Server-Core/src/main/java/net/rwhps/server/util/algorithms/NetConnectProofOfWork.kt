@@ -13,7 +13,7 @@ import net.rwhps.server.io.GameInputStream
 import net.rwhps.server.io.GameOutputStream
 import net.rwhps.server.struct.SerializerTypeAll
 import net.rwhps.server.util.math.RandomUtils
-import net.rwhps.server.util.StringFilteringUtil
+import net.rwhps.server.util.str.StringFilteringUtil
 import net.rwhps.server.util.Time
 import net.rwhps.server.util.algorithms.digest.DigestUtils
 import java.io.IOException

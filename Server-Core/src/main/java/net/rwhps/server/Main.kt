@@ -41,6 +41,8 @@ import net.rwhps.server.custom.LoadCoreCustomPlugin
 import net.rwhps.server.data.bean.BeanCoreConfig
 import net.rwhps.server.data.bean.BeanRelayConfig
 import net.rwhps.server.data.bean.BeanServerConfig
+import net.rwhps.server.data.bean.internal.BeanMainParameters
+import net.rwhps.server.data.global.ArrayData
 import net.rwhps.server.data.global.Data
 import net.rwhps.server.data.global.Data.privateReader
 import net.rwhps.server.data.global.Statisticians
@@ -49,10 +51,11 @@ import net.rwhps.server.dependent.HeadlessProxyClass
 import net.rwhps.server.func.StrCons
 import net.rwhps.server.game.EventGlobal
 import net.rwhps.server.game.event.global.ServerLoadEvent
+import net.rwhps.server.game.manage.IRwHpsManage
 import net.rwhps.server.game.manage.MapManage
 import net.rwhps.server.io.output.DynamicPrintStream
 import net.rwhps.server.net.NetService
-import net.rwhps.server.net.handler.tcp.StartHttp
+import net.rwhps.server.net.core.IRwHps
 import net.rwhps.server.util.SystemSetProperty
 import net.rwhps.server.util.console.TabCompleter
 import net.rwhps.server.util.file.FileUtils.Companion.getFolder
@@ -71,6 +74,7 @@ import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
 import org.jline.reader.UserInterruptException
 import org.jline.terminal.TerminalBuilder
+import java.io.ByteArrayInputStream
 import java.io.InterruptedIOException
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -89,18 +93,23 @@ object Main {
     @JvmStatic
     @Throws(Exception::class)
     fun main(args: Array<String>) {
+        // 夹带点私活 都给我听 UnicornPhantom
         Statisticians.addTime("Core.Main")
+        Data.mainParameters = BeanMainParameters.create(args)
         /* 设置Log 并开启拷贝 */
-        SystemSetProperty.setJlineIdea()
         /* OFF WARN */
         set("TRACK")
+        Log.set("TRACK")
+
+        SystemSetProperty.setJlineIdea()
+        SystemSetProperty.setOnlyIpv4()
+        SystemSetProperty.setAwtHeadless()
+
+
         Logger.getLogger("io.netty").level = Level.OFF
 
         /* 覆盖输入输出流 */
         inputMonitorInit()
-
-        SystemSetProperty.setOnlyIpv4()
-        SystemSetProperty.setAwtHeadless()
 
         Initialization()
 
@@ -137,13 +146,14 @@ object Main {
         }
         clog(Data.i18NBundle.getinput("server.loadPlugin", loadSize))
 
+        PluginManage.runOnEnable()
+
         /* Event加载 */
         LoadLogUtils.loadStatusLog("server.load.events") {
             PluginManage.addGlobalEventManage(EventGlobal())
             runRegisterGlobalEvents()
         }
 
-        PluginManage.runOnEnable()
 
         LoadLogUtils.loadStatusLog("server.load.plugin.command") {
             PluginManage.runRegisterCoreCommands(Data.SERVER_COMMAND)
@@ -174,7 +184,7 @@ object Main {
 
         Threads.newThreadCoreNet {
             if (Data.config.webPort != 0) {
-                val netServiceTcp1 = NetService(NetService.coreID(), StartHttp::class.java)
+                val netServiceTcp1 = NetService(NetService.coreID(), IRwHpsManage.addIRwHps(IRwHps.NetType.HttpProtocol, "CoreWebService"))
                 netServiceTcp1.openPort(Data.config.webPort)
             }
         }
@@ -187,6 +197,12 @@ object Main {
      * Win的CMD就是个垃圾
      */
     private fun inputMonitorInit() {
+        if (Data.mainParameters.noPrint) {
+            System.setIn(ByteArrayInputStream(ArrayData.bytes))
+            System.setErr(DynamicPrintStream {})
+            System.setOut(DynamicPrintStream {})
+        }
+
         val terminal = TerminalBuilder.builder().encoding(Data.DefaultEncoding).build()
 
         privateReader = LineReaderBuilder.builder().terminal(terminal).completer(TabCompleter()).build() as LineReader
@@ -198,9 +214,14 @@ object Main {
         System.setOut(DynamicPrintStream {
             privateReader.printAbove(it)
         })
+
     }
 
     private fun inputMonitor() {
+        if (Data.mainParameters.noPrint) {
+            return
+        }
+
         //# 209 防止连续多次错误
         val idlingCount = TimeAndNumber(5, 10)
         var last = 0

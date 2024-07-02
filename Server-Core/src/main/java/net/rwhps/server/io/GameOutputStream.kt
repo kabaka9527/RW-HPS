@@ -15,8 +15,8 @@ import net.rwhps.server.io.output.AbstractByteArrayOutputStream
 import net.rwhps.server.io.output.CompressOutputStream
 import net.rwhps.server.io.output.DisableSyncByteArrayOutputStream
 import net.rwhps.server.io.packet.Packet
-import net.rwhps.server.util.IsUtils
 import net.rwhps.server.io.packet.type.PacketType
+import net.rwhps.server.util.IsUtils
 import java.io.Closeable
 import java.io.DataOutputStream
 import java.io.IOException
@@ -31,20 +31,6 @@ open class GameOutputStream @JvmOverloads constructor(private var buffer: Abstra
     private var stream: DataOutputStream = DataOutputStream(buffer)
 
     fun createPacket(type: PacketType): Packet {
-        try {
-            stream.use {
-                buffer.use {
-                    stream.flush()
-                    buffer.flush()
-                    return Packet(type, buffer.toByteArray()!!)
-                }
-            }
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-    }
-
-    fun createPacket(type: Int): Packet {
         try {
             stream.use {
                 buffer.use {

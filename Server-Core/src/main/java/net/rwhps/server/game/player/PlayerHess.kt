@@ -119,6 +119,17 @@ open class PlayerHess(
         return "$name / Position: $position / IP: ${con!!.coverConnect().ip} / Use: ${con!!.coverConnect().useConnectionAgreement} / Admin: $isAdmin"
     }
 
+    val infoObject
+        get() = ObjectMap<String, Any>().apply {
+            put("Name", name)
+            put("Position", position)
+            put("ConnectHexID", connectHexID)
+            put("IP", con!!.coverConnect().ip)
+            put("IPCount", con!!.coverConnect().ipCountry)
+            put("TCP/UDP", con!!.coverConnect().useConnectionAgreement)
+            put("Admin", autoAdmin)
+        }
+
     private val noBindError: () -> Nothing get() = throw ImplementedException.PlayerImplementedException("[Player] No Bound Connection")
 
     fun updateDate() {

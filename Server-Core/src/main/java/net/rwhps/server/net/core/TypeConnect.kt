@@ -11,6 +11,7 @@ package net.rwhps.server.net.core
 
 import net.rwhps.server.io.packet.Packet
 import net.rwhps.server.net.core.server.AbstractNetConnect
+import net.rwhps.server.util.annotations.core.DependsClassLoader
 
 /**
  * Parser, parse each game package
@@ -20,6 +21,7 @@ import net.rwhps.server.net.core.server.AbstractNetConnect
  * @author Dr (dr@der.kim)
  * @date 2021/12/16 07:40:35
  */
+@DependsClassLoader
 interface TypeConnect {
     /**
      * 为什么要用con.getVersionNet来获取 多此一举

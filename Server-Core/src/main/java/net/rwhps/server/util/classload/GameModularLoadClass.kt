@@ -13,6 +13,7 @@ import net.rwhps.asm.agent.AsmCore
 import net.rwhps.server.struct.map.OrderedMap
 import net.rwhps.server.util.compression.CompressionDecoderUtils
 import net.rwhps.server.util.inline.toClass
+import net.rwhps.server.util.math.RandomUtils
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
@@ -40,6 +41,8 @@ open class GameModularLoadClass(
     private val classPathMap: OrderedMap<String, ByteArray> = OrderedMap()
 ): ClassLoader() {
     private val hashCode = Integer.toHexString(super.hashCode())
+
+    private val name = "${RandomUtils.getRandomIetterString(5)}:$hashCode"
 
     /**
      * Get all the Bytes of this loader, for the next reuse, and at the same time make each loader share the byte pool
@@ -183,6 +186,10 @@ open class GameModularLoadClass(
      */
     protected open fun asmClass(className: String, classfileBuffer: ByteArray): ByteArray {
         return AsmCore.transform(this, className, classfileBuffer)
+    }
+
+    override fun getName(): String {
+        return name
     }
 
     override fun toString(): String {

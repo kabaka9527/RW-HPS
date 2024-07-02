@@ -9,7 +9,6 @@
 
 package net.rwhps.server.plugin.internal.headless.inject.core.link
 
-import net.rwhps.server.data.global.NetStaticData
 import net.rwhps.server.game.headless.core.link.AbstractLinkGameFunction
 import net.rwhps.server.net.core.IRwHps
 import net.rwhps.server.plugin.internal.headless.inject.core.GameEngine
@@ -45,10 +44,11 @@ internal class LinkGameFunction: AbstractLinkGameFunction {
     }
 
     override fun clean() {
-        if (NetStaticData.ServerNetType != IRwHps.NetType.ServerProtocol) {
+        if (GameEngine.iRwHps == null || GameEngine.iRwHps!!.netType != IRwHps.NetType.ServerProtocol) {
             return
         }
         GameEngine.gameEngine.bX.b("exited")
+        GameEngine.root.showMainMenu()
         InterruptedException().printStackTrace()
     }
 }

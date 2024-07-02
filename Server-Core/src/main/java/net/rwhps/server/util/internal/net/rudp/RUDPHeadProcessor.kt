@@ -38,7 +38,7 @@ class RUDPHeadProcessor {
         try {
             socket.type!!.processConnect(Packet(socket.needType, bytes))
         } catch (e: Exception) {
-            Log.debug(e = e)
+            Log.debug(e)
         }
 
         socket.needLength = 0

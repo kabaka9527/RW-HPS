@@ -9,9 +9,7 @@
 
 package net.rwhps.server.game
 
-import net.rwhps.server.core.thread.Threads
 import net.rwhps.server.data.global.Data
-import net.rwhps.server.data.global.NetStaticData
 import net.rwhps.server.game.event.core.EventListenerHost
 import net.rwhps.server.game.event.global.NetConnectNewEvent
 import net.rwhps.server.game.event.global.ServerHessLoadEvent
@@ -20,14 +18,10 @@ import net.rwhps.server.game.event.global.ServerStartTypeEvent
 import net.rwhps.server.game.manage.HeadlessModuleManage
 import net.rwhps.server.game.player.PlayerHess
 import net.rwhps.server.net.Administration
-import net.rwhps.server.net.NetService
-import net.rwhps.server.net.api.WebGetRelayInfo
 import net.rwhps.server.net.core.IRwHps
-import net.rwhps.server.net.handler.tcp.StartHttp
-import net.rwhps.server.net.http.WebData
-import net.rwhps.server.util.CLITools
 import net.rwhps.server.util.Time
 import net.rwhps.server.util.annotations.core.EventListenerHandler
+import net.rwhps.server.util.console.CLITools
 import net.rwhps.server.util.file.plugin.PluginManage
 
 
@@ -63,24 +57,16 @@ class EventGlobal: EventListenerHost {
     @EventListenerHandler
     fun registerServerStartTypeEvent(serverStartTypeEvent: ServerStartTypeEvent) {
         when (serverStartTypeEvent.serverNetType) {
-            IRwHps.NetType.ServerProtocol, IRwHps.NetType.ServerProtocolOld, IRwHps.NetType.ServerTestProtocol -> {
-            }
             IRwHps.NetType.RelayProtocol, IRwHps.NetType.RelayMulticastProtocol -> {
                 if (Data.config.autoUpList) {
                     Data.SERVER_COMMAND.handleMessage("uplist add", Data.defPrint)
-                }
-
-                Threads.newThreadCore {
-                    val webData = WebData()
-                    webData.addWebGetInstance("/api/getRelayInfo", WebGetRelayInfo())
-                    NetService(NetService.coreID(), StartHttp::class.java).setWebData(webData).openPort(4994)
                 }
             }
             else -> {}
         }
 
         if (Data.config.cmdTitle.isBlank()) {
-            CLITools.setConsoleTitle("[RW-HPS] Port: ${Data.config.port}, Run Server: ${NetStaticData.ServerNetType.name}")
+            CLITools.setConsoleTitle("[RW-HPS] Port: ${Data.config.port}, Run Server: ${serverStartTypeEvent.serverNetType.name}")
         } else {
             CLITools.setConsoleTitle(Data.config.cmdTitle)
         }

@@ -66,6 +66,10 @@ class Json {
         }
     }
 
+    fun getJson(str: String): Json? {
+        return Json(jsonObject.getJSONObject(str))
+    }
+
 
     fun getInnerMap(): ObjectMap<String, Any> {
         return ObjectMap<String, Any>().apply {

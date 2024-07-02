@@ -16,8 +16,9 @@ import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.channel.socket.SocketChannel
 import io.netty.handler.codec.http.*
 import net.rwhps.server.data.global.Data
-import net.rwhps.server.data.global.NetStaticData
 import net.rwhps.server.io.packet.type.PacketType
+import net.rwhps.server.net.core.IRwHps
+import net.rwhps.server.struct.map.ObjectMap
 
 
 /**
@@ -28,8 +29,10 @@ import net.rwhps.server.io.packet.type.PacketType
 
 @ChannelHandler.Sharable
 @Suppress("UNUSED")
-class StartMixProtocol: StartHttp() {
-    private val rconService = StartRcon()
+class StartMixProtocol(mixData: ObjectMap<IRwHps.NetType, IRwHps>): StartHttp(mixData[IRwHps.NetType.HttpProtocol]!!) {
+    // 我真棒, 写了坨大的
+    private val gameServer = StartGameNetTcp(mixData[IRwHps.NetType.GameProtocol]!!)
+    private val remoteControlService = StartRemoteControl(mixData[IRwHps.NetType.RemoteControlProtocol]!!)
 
     override fun initChannel(socketChannel: SocketChannel) {
         val sup = this
@@ -37,17 +40,16 @@ class StartMixProtocol: StartHttp() {
             @Throws(Exception::class)
             override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
                 val firstData: ByteBuf = msg as ByteBuf
-
                 run {
                     // Game
                     if(read(firstData) {
                         val readPacketLengthCache = it.readInt()
                         val readPacketTypeCache = it.readInt()
                         if (readPacketLengthCache > 0 && readPacketTypeCache > 0 &&
-                            (NetStaticData.RwHps.packetType.from(readPacketTypeCache).typeInt > 1000 ||
-                             NetStaticData.RwHps.packetType.from(readPacketTypeCache) == PacketType.PREREGISTER_INFO_RECEIVE)
+                            (IRwHps.packetType.from(readPacketTypeCache).typeInt > 1000 ||
+                             IRwHps.packetType.from(readPacketTypeCache) == PacketType.PREREGISTER_INFO_RECEIVE)
                         ) {
-                            rwinit(socketChannel.pipeline())
+                            gameServer.initHandler(socketChannel.pipeline())
                             return@read true
                         }
                         return@read false
@@ -55,13 +57,13 @@ class StartMixProtocol: StartHttp() {
 
                     // Rcon
                     if(Data.config.rconMixEnable && read(firstData) {
-                        val readRconLengthCache = it.readIntLE()
-                        val readRconIDCache = it.readIntLE()
-                        val readRconTypeCache = it.readIntLE()
-                        if (readRconLengthCache in 4..4096 &&
-                            (readRconTypeCache in 0..3 && readRconTypeCache != 1)
+                        val readRemoteControlLengthCache = it.readIntLE()
+                        val readRemoteControlIDCache = it.readIntLE()
+                        val readRemoteControlTypeCache = it.readIntLE()
+                        if (readRemoteControlLengthCache in 4..4096 &&
+                            (readRemoteControlTypeCache in 0..3 && readRemoteControlTypeCache != 1)
                         ) {
-                            rconService.initChannel(socketChannel)
+                            remoteControlService.initHandler(socketChannel.pipeline())
                             return@read true
                         }
                         return@read false

@@ -15,6 +15,7 @@ import net.rwhps.server.game.event.global.NetConnectCloseEvent
 import net.rwhps.server.io.packet.Packet
 import net.rwhps.server.net.GroupNet
 import net.rwhps.server.net.handler.bio.PackagingSocket
+import net.rwhps.server.net.netconnectprotocol.FakeRwHps
 import net.rwhps.server.util.IPCountry
 import net.rwhps.server.util.IpUtils
 import net.rwhps.server.util.file.plugin.PluginManage
@@ -36,6 +37,8 @@ class ConnectionAgreement {
     private val objectOutStream: Any
     private val udpDataOutputStream: DataOutputStream?
 
+    val rwHps: IRwHps
+
     val isClosed: () -> Boolean
     val useAgreement: String
     val ip: String
@@ -51,7 +54,8 @@ class ConnectionAgreement {
      * TCP Send
      * @param channelHandlerContext Netty-ChannelHandlerContext
      */
-    internal constructor(channelHandlerContext: ChannelHandlerContext, attributeKey: AttributeKey<TypeConnect>) {
+    internal constructor(channelHandlerContext: ChannelHandlerContext, attributeKey: AttributeKey<TypeConnect>, rwHps: IRwHps) {
+        this.rwHps = rwHps
         val channel = channelHandlerContext.channel()
         objectOutStream = channelHandlerContext
         udpDataOutputStream = null
@@ -85,6 +89,7 @@ class ConnectionAgreement {
      * @throws IOException Error
      */
     internal constructor(socket: PackagingSocket) {
+        this.rwHps = FakeRwHps(this::class.java.classLoader, IRwHps.NetType.NullProtocol)
         val socketStream = DataOutputStream(socket.outputStream)
         protocolType = { packet: Packet ->
             socketStream.writeInt(packet.bytes.size)
@@ -105,10 +110,12 @@ class ConnectionAgreement {
         localPort = socket.localPort
     }
 
-    internal constructor(ignore: Boolean) {
+    internal constructor(rwHps: IRwHps) {
+        this.rwHps = rwHps
+
         objectOutStream = ""
         udpDataOutputStream = null
-        useAgreement = "Headless-$ignore"
+        useAgreement = "Headless-AI"
         isClosed = { false }
         closeClean = { }
 
@@ -122,6 +129,8 @@ class ConnectionAgreement {
     }
 
     constructor() {
+        this.rwHps = FakeRwHps(this::class.java.classLoader, IRwHps.NetType.NullProtocol)
+
         protocolType = {}
         objectOutStream = ""
         udpDataOutputStream = null

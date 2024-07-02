@@ -10,7 +10,7 @@
 package net.rwhps.server.util.algorithms.codec
 
 import net.rwhps.server.data.global.Data
-import net.rwhps.server.util.StringUtils
+import net.rwhps.server.util.str.StringUtils
 import java.nio.charset.Charset
 
 

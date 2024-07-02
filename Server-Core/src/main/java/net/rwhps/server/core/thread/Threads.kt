@@ -29,6 +29,8 @@ object Threads {
     /** Execute runnable on exit  */
     private val SAVE_POOL = Seq<Runnable>()
 
+    internal val dataAutoSave = Seq<Runnable>(8)
+
     /**
      * 关闭全部线程池
      */
@@ -92,7 +94,7 @@ object Threads {
 
     @JvmStatic
     fun runSavePool() {
-        SAVE_POOL.eachAll { obj: Runnable -> obj.run() }
+        SAVE_POOL.eachAll(Runnable::run)
     }
 
 
