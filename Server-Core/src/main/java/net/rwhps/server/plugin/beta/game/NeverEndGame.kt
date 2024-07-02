@@ -17,4 +17,4 @@ import net.rwhps.server.plugin.Plugin
  * @date 2024/5/25 下午9:25
  * @author Dr (dr@der.kim)
  */
-class NeverEndGame : Plugin() {}
+class NeverEndGame : Plugin()

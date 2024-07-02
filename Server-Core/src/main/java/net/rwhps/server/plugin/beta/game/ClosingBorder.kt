@@ -14,6 +14,4 @@ import net.rwhps.server.plugin.Plugin
 /**
  * @author Dr (dr@der.kim)
  */
-class ClosingBorder: Plugin() {
-
-}
+class ClosingBorder: Plugin()

@@ -15,4 +15,4 @@ package net.rwhps.server.net.netconnectprotocol
  * @date 2024/5/4 上午10:10
  * @author Dr (dr@der.kim)
  */
-class TypeRemoteControl {}
+class TypeRemoteControl
