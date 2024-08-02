@@ -4,12 +4,13 @@
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
- * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  */
 
 package net.rwhps.server.plugin.internal.headless.inject.command
 
 import com.corrodinggames.rts.game.n
+import com.corrodinggames.rts.gameFramework.j.ai
 import net.rwhps.server.data.global.Data
 import net.rwhps.server.data.global.Data.LINE_SEPARATOR
 import net.rwhps.server.data.global.NetStaticData
@@ -19,11 +20,14 @@ import net.rwhps.server.game.manage.HeadlessModuleManage
 import net.rwhps.server.game.manage.MapManage
 import net.rwhps.server.game.manage.ModManage
 import net.rwhps.server.game.player.PlayerHess
+import net.rwhps.server.game.player.unofficial.Cherry
 import net.rwhps.server.plugin.internal.headless.inject.core.GameEngine
 import net.rwhps.server.plugin.internal.headless.inject.util.TabCompleterProcess
 import net.rwhps.server.struct.list.Seq
+import net.rwhps.server.struct.map.BaseMap.Companion.toSeq
 import net.rwhps.server.util.Font16
 import net.rwhps.server.util.IsUtils
+import net.rwhps.server.util.IsUtils.notIsNumeric
 import net.rwhps.server.util.Time
 import net.rwhps.server.util.Time.getTimeFutureMillis
 import net.rwhps.server.util.console.tab.TabDefaultEnum.PlayerPosition
@@ -107,6 +111,22 @@ internal class ServerCommands(handler: CommandHandler) {
             TabCompleterProcess.playerPosition(arg[0], log)?.let { player ->
                 GameEngine.data.eventManage.fire(PlayerBanEvent(gameModule, player))
             }
+        }
+        handler.register("mapchange", "#Change Maps") { _: Array<String>?, _: StrCons? ->
+            // 0 是自定义地图序号
+            val nameNoPx = MapManage.mapsData.keys.toSeq()[0]
+            val data = MapManage.mapsData[nameNoPx]!!
+            val name = "$nameNoPx${data.mapType.fileType}"
+            room.maps.mapData = data
+            room.maps.mapType = data.mapType
+            room.maps.mapName = nameNoPx
+            room.maps.mapPlayer = ""
+            GameEngine.netEngine.az = "/SD/rusted_warfare_maps/$name"
+            GameEngine.netEngine.ay.a = ai.entries.toTypedArray()[data.mapType.ordinal]
+            GameEngine.netEngine.ay.b = name
+
+            room.call.sendSystemMessage(localeUtil.getinput("map.to","Admin", room.maps.mapName))
+            GameEngine.netEngine.L()
         }
         handler.register("unban", "<$PlayerPositionNoAI>", "serverCommands.ban") { arg: Array<String>, log: StrCons ->
             TabCompleterProcess.playerPosition(arg[0], log)?.let { player ->
@@ -294,6 +314,9 @@ internal class ServerCommands(handler: CommandHandler) {
         handler.register("test", "serverCommands.addmoney") { _: Array<String>, _: StrCons ->
             // 截图
             GameEngine.mainObject.j!!.a(null as Graphics?, true)
+        }
+        handler.register("aaa", "serverCommands.clearbanall") { _: Array<String>?, _: StrCons ->
+            gameModule.room.clientHandler.handleMessage("/am on", Cherry() as PlayerHess)
         }
     }
 

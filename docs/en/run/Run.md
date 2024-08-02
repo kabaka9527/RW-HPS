@@ -84,7 +84,7 @@ java -D"file.encoding=UTF-8" -jar Server.jar
 
 ## 1. Use the Precompiled Version from Our Github
 
-1. Download the version from our [Releases](https://github.com/RW-HPS/RW-HPS/releases).
+1. Download the version from our [Releases](https://github.com/deng-rui/RW-HPS/releases).
 
 ## 2. Linux Platform
 
@@ -124,12 +124,12 @@ sudo apt-get install git oracle-java11-installer screen -y
 
 ```bash
 HTTPS  
-git clone https://github.com/RW-HPS/RW-HPS.git
+git clone https://github.com/deng-rui/RW-HPS.git
 ``` 
 
 ```bash  
 SSH
-git clone git@github.com:RW-HPS/RW-HPS.git  
+git clone git@github.com:deng-rui/RW-HPS.git  
 ```
 
 3. Start compiling the latest version

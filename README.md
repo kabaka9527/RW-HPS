@@ -2,20 +2,17 @@
 <h1>RW-HPS Project</h1>
 
 ----
-![](https://img.shields.io/github/stars/RW-HPS/RW-HPS.svg)
-![](https://github.com/RW-HPS/RW-HPS/actions/workflows/gradle.yml/badge.svg?branch=master)
-![](https://jitpack.io/v/RW-HPS/RW-HPS.svg)
-![](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRW-HPS%2FRW-HPS.svg?type=shield)
+![](https://img.shields.io/github/stars/deng-rui/RW-HPS.svg)
+![](https://github.com/deng-rui/RW-HPS/actions/workflows/gradle.yml/badge.svg?branch=master)
+![](https://jitpack.io/v/deng-rui/RW-HPS.svg)
+![](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdeng-rui%2FRW-HPS.svg?type=shield)
 
 [English version / 英文介绍](README.md) **or** [Chinese version / 中文介绍](README-CN.md)  
 **RW-HPS** is a **Rusted Warfare** game server  
 Used to quickly set up high-performance game servers on servers running Java21  
 Provide players with the same gaming experience as the official server
 
-_**生命不息，折腾不止**_
-
-**Thank you for staying with me for four years. We have experienced a lot, but life has dreams and each of them is wonderful. At present, I have no interest in maintenance/development.**  
-**感谢陪伴四年, 我们经历很多, 但是 人生有梦, 各自精彩, 目前我已无兴趣进行维护/开发**
+_**Personal project, for learning only**_
 </div>
 
 #### Currently to be completed
@@ -29,8 +26,8 @@ _**生命不息，折腾不止**_
 ## Needs Help?
 
 - Documentation: [docs](docs/en/README.md)
-- Update log: [release](https://github.com/RW-HPS/RW-HPS/releases)
-- Development milestones: [milestones](https://github.com/RW-HPS/RW-HPS/milestones)
+- Update log: [release](https://github.com/deng-rui/RW-HPS/releases)
+- Development milestones: [milestones](https://github.com/deng-rui/RW-HPS/milestones)
 - Discussion:
   > The development team is actively answering questions on Github Discussions, please feel free to share you ideas about this project.  
   > Email contact: dr@der.kim      
@@ -38,7 +35,7 @@ _**生命不息，折腾不止**_
   > <del>Telegram Group: [RW-HPS](https://t.me/RW_HPS) </del>  
   > Discord: [RW-HPS](https://discord.gg/VwwxJhVG64)
 - Mirrors:
-  [Github](https://github.com/RW-HPS/RW-HPS) ; [Gitee](https://gitee.com/derdct/RW-HPS)
+  [Github](https://github.com/deng-rui/RW-HPS) ; [Gitee](https://gitee.com/derdct/RW-HPS)
 
 ### Used by whom
 
@@ -108,7 +105,7 @@ If you meet any problem or have any questions, feel free to file an issue. Our g
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/RW-HPS/RW-HPS.svg)](https://starchart.cc/RW-HPS/RW-HPS)
+[![Stargazers over time](https://starchart.cc/deng-rui/RW-HPS.svg)](https://starchart.cc/deng-rui/RW-HPS)
 
 ## License
 
@@ -137,7 +134,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 <details>
-  <summary><a href="https://github.com/RW-HPS/RW-HPS/blob/master/Server/src/main/resources/eula/China.md">EULA</a></summary>
+  <summary><a href="https://github.com/deng-rui/RW-HPS/blob/master/Server/src/main/resources/eula/China.md">EULA</a></summary>
 
 ```
 版权所有©2022 RW-HPS.Team <RW-HPS@der.kim>

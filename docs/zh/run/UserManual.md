@@ -60,7 +60,7 @@ Config配置解释 : [服务器配置](Config.md)
 ## 解决问题
 
 如果遇到使用问题或想提建议，可以在  
-[issues](https://github.com/RW-HPS/RW-HPS/issues)  
+[issues](https://github.com/deng-rui/RW-HPS/issues)  
 [Tencent QQ群](https://qm.qq.com/cgi-bin/qm/qr?k=qhJ6ekYF9pD9jO6j8H2rZw8ePAVypoU0&jump_from=webapi)  
 <del>[Telegram组](https://t.me/RW_HPS) </del>  
 [DisCord组](https://discord.gg/VwwxJhVG64)

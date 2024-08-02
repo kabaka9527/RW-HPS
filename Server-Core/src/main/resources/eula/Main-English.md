@@ -132,7 +132,7 @@ for the duration of the copyright in the Work, to exercise the following rights 
     2. For the health of the list, please use the [UPList] function appropriately when you use this work.
 2. game agreement implementation . 1:
     1. The license is subject to the RW-HPS-Simulation
-       license (https://github.com/RW-HPS/RW-HPS/blob/master/Server-Core/src/main/java/net/rwhps/server/game/simulation/README.kt )
+       license (https://github.com/deng-rui/RW-HPS/blob/master/Server-Core/src/main/java/net/rwhps/server/game/simulation/README.kt )
     2. The implementation of the game `Headless` is consistent with the `STEAM` source code, and no modifications are provided.
 
 #### 5. Disclaimers.

@@ -8,4 +8,4 @@ WARN ! WARN !
 
 
 LINK: https://docs.rwhps.net/
-LINK: https://github.com/RW-HPS/RW-HPS-Docs
+LINK: https://github.com/deng-rui/RW-HPS-Docs

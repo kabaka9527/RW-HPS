@@ -4,7 +4,7 @@
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
- * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  */
 
 package net.rwhps.server.game
@@ -76,7 +76,7 @@ class Event: EventListenerHost {
         if (Data.configServer.autoStartMinPlayerSize != -1 && playerJoinEvent.gameModule.room.playerManage.playerGroup.size >= Data.configServer.autoStartMinPlayerSize && !Threads.containsTimeTask(
                     CallTimeTask.AutoStartTask
             )) {
-            var flagCount = 60
+            var flagCount = 10
             Threads.newTimedTask(CallTimeTask.AutoStartTask, 0, 1, TimeUnit.SECONDS) {
                 if (playerJoinEvent.gameModule.room.isStartGame) {
                     Threads.closeTimeTask(CallTimeTask.AutoStartTask)
@@ -86,16 +86,14 @@ class Event: EventListenerHost {
                 flagCount--
 
                 if (flagCount > 0) {
-                    if ((flagCount - 5) > 0) {
-                        playerJoinEvent.gameModule.room.call.sendSystemMessage(Data.i18NBundle.getinput("auto.start", flagCount))
-                    }
+                    playerJoinEvent.gameModule.room.call.sendSystemMessage(Data.i18NBundle.getinput("auto.start", flagCount))
                     return@newTimedTask
                 }
 
                 Threads.closeTimeTask(CallTimeTask.AutoStartTask)
                 Threads.closeTimeTask(CallTimeTask.PlayerAfkTask)
 
-                playerJoinEvent.gameModule.room.clientHandler.handleMessage("start", null)
+                playerJoinEvent.gameModule.room.clientHandler.handleMessage("/start", null)
             }
         }
 

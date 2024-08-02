@@ -4,7 +4,7 @@
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
- * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  */
 
 /**
@@ -15,7 +15,7 @@
  * RW-HPS 由整个开源社区维护，并不是属于某个个体的作品，所有贡献者都享有其作品的著作权
  *
  * 若修改 RW-HPS 源代码再发布，或参考 RW-HPS 内部实现
- * 则衍生项目必须在文章首部或 'RW-HPS' 相关内容首次出现的位置明确声明来源于本仓库 (https://github.com/RW-HPS/RW-HPS) 不得扭曲或隐藏免费且开源的事实
+ * 则衍生项目必须在文章首部或 'RW-HPS' 相关内容首次出现的位置明确声明来源于本仓库 (https://github.com/deng-rui/RW-HPS) 不得扭曲或隐藏免费且开源的事实
  */
 /**
  * Disclaimer :
@@ -26,7 +26,7 @@
  *
  * The RW-HPS is maintained by the entire open source community and is not the work of any individual.
  * If you modify the RW-HPS source code for redistribution, or refer to the RW-HPS internal implementation
- * Derivative projects must explicitly state that they are from this repository (https://github.com/RW-HPS/RW-HPS) at the beginning of the article or at the first appearance of the 'RW-HPS' related content, without distorting or hiding the fact that they are free and open source
+ * Derivative projects must explicitly state that they are from this repository (https://github.com/deng-rui/RW-HPS) at the beginning of the article or at the first appearance of the 'RW-HPS' related content, without distorting or hiding the fact that they are free and open source
  */
 
 package net.rwhps.server

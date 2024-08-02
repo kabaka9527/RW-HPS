@@ -4,7 +4,7 @@
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
- * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  */
 
 package net.rwhps.server.net.api
@@ -46,7 +46,7 @@ class WebGetRelayInfo: WebGet() {
                               ~ 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
                               ~ Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
                               ~
-                              ~ https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+                              ~ https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
                               -->
             
                             <!DOCTYPE html>
@@ -85,7 +85,7 @@ class WebGetRelayInfo: WebGet() {
                                         邮件联系: <a href="mailto:dr@der.kim">dr@der.kim</a><br>
                                         腾讯QQ群: <del>去Github自己看</del>
                                         <br>
-                                        Github: <a href="https://github.com/RW-HPS/RW-HPS" rel="nofollow">RW-HPS</a></p>
+                                        Github: <a href="https://github.com/deng-rui/RW-HPS" rel="nofollow">RW-HPS</a></p>
                                         <del>电报群: <a href="https://t.me/RW_HPS" rel="nofollow">RW-HPS</a></del>
                                         <br>
                                         Discord: <a href="https://discord.gg/VwwxJhVG64" rel="nofollow">RW-HPS</a></p>

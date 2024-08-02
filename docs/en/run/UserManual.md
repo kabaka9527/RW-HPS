@@ -60,7 +60,7 @@ Type `.map + space + ID` in the client chat box to switch to your custom map.
 ## Troubleshooting
 
 If you encounter any issues or have suggestions, you can post and discuss them in  
-[issues](https://github.com/RW-HPS/RW-HPS/issues)  
+[issues](https://github.com/deng-rui/RW-HPS/issues)  
 [Tencent QQ Group](https://qm.qq.com/cgi-bin/qm/qr?k=qhJ6ekYF9pD9jO6j8H2rZw8ePAVypoU0&jump_from=webapi)  
 [Telegram Group](https://t.me/RW_HPS) \
 [DisCord Group](https://discord.gg/VwwxJhVG64)

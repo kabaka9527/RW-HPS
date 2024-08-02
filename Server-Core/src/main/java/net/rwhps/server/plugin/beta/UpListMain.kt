@@ -4,7 +4,7 @@
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
- * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  */
 
 package net.rwhps.server.plugin.beta
@@ -277,16 +277,12 @@ internal class UpListMain: Plugin() {
 
     private fun remove(log: StrCons) {
         if (upServerList) {
-            if (Threads.closeTimeTask(CallTimeTask.CustomUpServerListTask) {
-                    Data.core.rwHttp.doPost("http://gs1.corrodinggames.com/masterserver/1.4/interface", removeData)
-                    Data.core.rwHttp.doPost("http://gs4.corrodinggames.net/masterserver/1.4/interface", removeData)
-                }) {
-                upServerList = false
-                uplistFlag = 0
-                log("Deleted UPLIST")
-                return
-            }
-            log("Delete failed, unable to stop thread")
+            Data.core.rwHttp.doPost("http://gs1.corrodinggames.com/masterserver/1.4/interface", removeData)
+            Data.core.rwHttp.doPost("http://gs4.corrodinggames.net/masterserver/1.4/interface", removeData)
+            upServerList = false
+            uplistFlag = 0
+            log("Deleted UPLIST")
+            return
         } else {
             log("Not uploaded No deletion is required")
         }

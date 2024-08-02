@@ -82,7 +82,7 @@
     2. 为了列表的健康, 当您使用本作品时, 请合理使用 [UPList] 功能
 2. 游戏协议实现 :
     1. 协议版权 均受 RW-HPS-Simulation
-       许可证约束 (https://github.com/RW-HPS/RW-HPS/blob/master/Server-Core/src/main/java/net/rwhps/server/game/simulation/README.kt)
+       许可证约束 (https://github.com/deng-rui/RW-HPS/blob/master/Server-Core/src/main/java/net/rwhps/server/game/simulation/README.kt)
     2. 游戏 `Headless` 实现均保持在 `STEAM` 源码一致性, 不提供任何修改
 
 #### 5. 免责声明：

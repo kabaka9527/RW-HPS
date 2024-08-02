@@ -4,7 +4,7 @@
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
- * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  */
 
 dependencies {
@@ -32,15 +32,15 @@ publishing {
 
             pom {
                 scm {
-                    url.set("https://github.com/RW-HPS/RW-HPS")
-                    connection.set("scm:https://github.com/RW-HPS/RW-HPS.git")
-                    developerConnection.set("scm:git@github.com:RW-HPS/RW-HPS.git")
+                    url.set("https://github.com/deng-rui/RW-HPS")
+                    connection.set("scm:https://github.com/deng-rui/RW-HPS.git")
+                    developerConnection.set("scm:git@github.com:deng-rui/RW-HPS.git")
                 }
 
                 licenses {
                     license {
                         name.set("GNU AGPLv3")
-                        url.set("https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE")
+                        url.set("https://github.com/deng-rui/RW-HPS/blob/master/LICENSE")
                     }
                 }
 
@@ -57,7 +57,7 @@ publishing {
                 val root = asNode()
                 root.appendNode("description", project.description)
                 root.appendNode("name", project.name)
-                root.appendNode("url", "https://github.com/RW-HPS/RW-HPS")
+                root.appendNode("url", "https://github.com/deng-rui/RW-HPS")
             }
         }
     }

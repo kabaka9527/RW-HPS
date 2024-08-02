@@ -4,7 +4,7 @@
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
- * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  */
 
 package net.rwhps.server.plugin.internal.headless.inject.command
@@ -16,23 +16,30 @@ import net.rwhps.server.command.ex.Vote
 import net.rwhps.server.core.thread.CallTimeTask
 import net.rwhps.server.core.thread.Threads
 import net.rwhps.server.data.global.Data
+import net.rwhps.server.func.StrCons
 import net.rwhps.server.game.GameMaps
 import net.rwhps.server.game.enums.GamePingActions
+import net.rwhps.server.game.event.game.PlayerBanEvent
 import net.rwhps.server.game.event.game.ServerGameStartEvent
 import net.rwhps.server.game.manage.HeadlessModuleManage
 import net.rwhps.server.game.manage.MapManage
 import net.rwhps.server.game.player.PlayerHess
+import net.rwhps.server.game.room.RelayRoom
 import net.rwhps.server.net.core.server.AbstractNetConnectServer
+import net.rwhps.server.net.netconnectprotocol.realize.GameVersionRelay
 import net.rwhps.server.plugin.internal.headless.inject.core.GameEngine
+import net.rwhps.server.plugin.internal.headless.inject.util.TabCompleterProcess
 import net.rwhps.server.struct.map.BaseMap.Companion.toSeq
+import net.rwhps.server.util.IsUtils
 import net.rwhps.server.util.IsUtils.isNumeric
 import net.rwhps.server.util.IsUtils.notIsNumeric
+import net.rwhps.server.util.Time
 import net.rwhps.server.util.algorithms.HexUtils
-import net.rwhps.server.util.console.tab.TabDefaultEnum.PlayerPosition
-import net.rwhps.server.util.console.tab.TabDefaultEnum.PlayerPositionAI
+import net.rwhps.server.util.console.tab.TabDefaultEnum.*
 import net.rwhps.server.util.file.plugin.PluginManage
 import net.rwhps.server.util.game.command.CommandHandler
 import net.rwhps.server.util.inline.findField
+import net.rwhps.server.util.log.Log
 import net.rwhps.server.util.log.Log.error
 import java.io.IOException
 import java.math.BigInteger
@@ -438,8 +445,18 @@ internal class ClientCommands(handler: CommandHandler) {
                     )
             )
         }
+        handler.register("sync", "<on/off>", "clientCommands.sync") { args: Array<String>, player: PlayerHess ->
+            if (isAdmin(player)) {
+                gameModule.room.sync = "on".equals(args[0], true)
+                player.sendSystemMessage(localeUtil.getinput("server.sync", if (gameModule.room.sync) "启用" else "禁止"))
+            }
+        }
         handler.register("vote", "<gameover>", "clientCommands.vote") { _: Array<String>?, player: PlayerHess ->
             Data.vote = Vote("gameover", player)
+        }
+        handler.register("setmaxplayer", "<number>", "clientCommands.vote") { args: Array<String>, player: PlayerHess ->
+            n.b(args[0].toInt(), true)
+            player.sendSystemMessage("设置最大人数: ${args[0]}")
         }
         handler.register("iunit", "<$PlayerPosition> <unitID>", "clientCommands.iunit") { args: Array<String>, player: PlayerHess ->
             if (room.isStartGame) {
@@ -545,6 +562,68 @@ internal class ClientCommands(handler: CommandHandler) {
         handler.register("myid", "clientCommands.-") { _: Array<String>, player: PlayerHess ->
             player.sendSystemMessage(player.i18NBundle.getinput("myid", BigInteger(HexUtils.decodeHex(player.connectHexID)).toInt().let { if (it < 0) -it else it }))
         }
+        /*
+        handler.register("banu", "<ID>", "#BAN UNIT") { args: Array<String>, player: PlayerHess ->
+            if (isAdmin(player)) {
+                when (args[0]) {
+                    "0" -> {
+                        if (!gameModule.room.banUnit.contains("fabricator")) {
+                            gameModule.room.banUnit.add("fabricator")
+                            player.sendSystemMessage("BAN 资源制造器")
+                        } else {
+                            player.sendSystemMessage("重复禁止 BAN 资源制造器")
+                        }
+                    }
+                    "1" -> {
+                        if (!gameModule.room.banUnit.contains("experimentalLandFactory")) {
+                            gameModule.room.banUnit.add("experimentalLandFactory")
+                            player.sendSystemMessage("BAN 实验工厂")
+                        } else {
+                            player.sendSystemMessage("重复禁止 BAN 实验工厂")
+                        }
+                    }
+                    "2" -> {
+                        if (!gameModule.room.banUnit.contains("builder")) {
+                            gameModule.room.banUnit.add("builder")
+                            player.sendSystemMessage("BAN 建造者")
+                        } else {
+                            player.sendSystemMessage("重复禁止 BAN 建造者")
+                        }
+                    }
+                    else -> {
+                        if (!gameModule.room.banUnit.contains(args[0])) {
+                            gameModule.room.banUnit.add(args[0])
+                            player.sendSystemMessage("BAN ${args[0]}")
+                        }
+                    }
+                }
+            }
+        }
+        */
+        handler.register("ban", "<Name/Position>", "serverCommands.ban") { args: Array<String>, player: PlayerHess ->
+            if (isAdmin(player)) {
+                val conTg: PlayerHess? = findPlayer(player, args[0])
+                conTg?.let {
+                    GameEngine.data.eventManage.fire(PlayerBanEvent(gameModule, player))
+                    player.sendSystemMessage("Ban : ${args[0]} OK")
+                }
+            }
+        }
+        handler.register("kickx", "<Name/Position>", "#Kick Player") { args: Array<String>, player: PlayerHess ->
+            if (isAdmin(player)) {
+                val conTg: PlayerHess? = findPlayer(player, args[0])
+                conTg?.let {
+                    it.kickPlayer("你被踢出服务器", 120)
+                    player.sendSystemMessage("Kick : ${args[0]} OK")
+                }
+            }
+        }
+        handler.register("allmute", "<on/off>", "#Mute All") { args: Array<String>, player: PlayerHess ->
+            if (isAdmin(player)) {
+                gameModule.room.muteAll = "on".equals(args[0], true)
+                player.sendSystemMessage("全体禁言 : ${if (gameModule.room.muteAll) "启用" else "禁用" } OK")
+            }
+        }
     }
 
     init {
@@ -552,6 +631,56 @@ internal class ClientCommands(handler: CommandHandler) {
         registerGameCommandX(handler)
         registerGameCustomCommand(handler)
         PluginManage.runRegisterServerClientCommands(handler)
+    }
+
+    private fun findPlayer(player: PlayerHess, findIn: String): PlayerHess? {
+        var conTg: PlayerHess? = null
+
+        var findNameIn: String? = null
+        var findPositionIn: Int? = null
+
+        if (IsUtils.isNumeric(findIn)) {
+            findPositionIn = findIn.toInt()
+        } else {
+            findNameIn = findIn
+        }
+
+        findNameIn?.let { findName ->
+            var count = 0
+            gameModule.room.playerManage.playerAll.forEach {
+                if (it.name.contains(findName, ignoreCase = true)) {
+                    conTg = it
+                    count++
+                }
+            }
+            if (count > 1) {
+                player.sendSystemMessage("目标不止一个, 请不要输入太短的玩家名")
+                return@let
+            }
+            if (conTg == null) {
+                player.sendSystemMessage("找不到玩家")
+                return@let
+            }
+        }
+
+        findPositionIn?.let { findPosition ->
+            gameModule.room.playerManage.playerAll.forEach {
+                if (it.position == findPosition) {
+                    conTg = it
+                }
+            }
+            if (conTg == null) {
+                player.sendSystemMessage("找不到玩家")
+                return@let
+            }
+        }
+
+        if (conTg != null && conTg!!.isAdmin) {
+            player.sendSystemMessage("不能踢出管理员")
+            return null
+        }
+
+        return conTg
     }
 
     companion object {

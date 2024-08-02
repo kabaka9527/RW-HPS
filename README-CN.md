@@ -2,9 +2,9 @@
 <h1>RW-HPS Project</h1>
 
 ----
-![](https://img.shields.io/github/stars/RW-HPS/RW-HPS.svg)
-![](https://github.com/RW-HPS/RW-HPS/actions/workflows/gradle.yml/badge.svg?branch=master)
-![](https://jitpack.io/v/RW-HPS/RW-HPS.svg)
+![](https://img.shields.io/github/stars/deng-rui/RW-HPS.svg)
+![](https://github.com/deng-rui/RW-HPS/actions/workflows/gradle.yml/badge.svg?branch=master)
+![](https://jitpack.io/v/deng-rui/RW-HPS.svg)
 ![](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRW-HPS%2FRW-HPS.svg?type=shield)
 
 [English version / 英文介绍](README.md) **or** [Chinese version / 中文介绍](README-CN.md)  
@@ -12,10 +12,7 @@
 用于在运行 Java21 的服务器上快速建立高性能游戏服务器  
 旨在作为一个高性能, 高可用的服务器 为玩家提供和官方服务器一样的游戏体验
 
-_**生命不息，折腾不止**_
-
-**Thank you for staying with me for four years. We have experienced a lot, but life has dreams and each of them is wonderful. At present, I have no interest in maintenance/development.**  
-**感谢陪伴四年, 我们经历很多, 但是 人生有梦, 各自精彩, 目前我已无兴趣进行维护/开发**
+_**个人项目, 仅供学习**_
 </div>
 
 ## 声明
@@ -36,7 +33,7 @@ _**生命不息，折腾不止**_
 
 - 若引用 RW-HPS 发布的软件包而不修改 RW-HPS，则衍生项目需在描述的任意部位提及使用 RW-HPS。
 - 若修改 RW-HPS 源代码再发布，**或参考 RW-HPS 内部实现发布另一个项目**，则衍生项目必须在**文章首部**或 'RW-HPS' 相关内容**首次出现**的位置*
-  *明确声明**来源于本仓库 (`https://github.com/RW-HPS/RW-HPS`) 不得扭曲或隐藏免费且开源的事实。
+  *明确声明**来源于本仓库 (`https://github.com/deng-rui/RW-HPS`) 不得扭曲或隐藏免费且开源的事实。
 
 #### 目前待完成
 
@@ -50,8 +47,8 @@ _**生命不息，折腾不止**_
 
 - 用户手册: [docs](docs/zh/run/UserManual.md)
 - 开发文档: [docs](docs/zh/README.md)
-- 更新日志: [release](https://github.com/RW-HPS/RW-HPS/releases)
-- 开发计划: [milestones](https://github.com/RW-HPS/RW-HPS/milestones)
+- 更新日志: [release](https://github.com/deng-rui/RW-HPS/releases)
+- 开发计划: [milestones](https://github.com/deng-rui/RW-HPS/milestones)
 - 讨论:
   > 在 GitHub Discussions 提出的问题会收到回复, 也欢迎分享你基于项目的新想法  
   > 邮件联系: dr@der.kim  
@@ -59,7 +56,7 @@ _**生命不息，折腾不止**_
   > <del>电报群: [RW-HPS](https://t.me/RW_HPS) </del>  
   > Discord: [RW-HPS](https://discord.gg/VwwxJhVG64)
 - 镜像:
-  [Github](https://github.com/RW-HPS/RW-HPS) ;  [Gitee](https://gitee.com/derdct/RW-HPS)
+  [Github](https://github.com/deng-rui/RW-HPS) ;  [Gitee](https://gitee.com/derdct/RW-HPS)
 
 ### 我们被谁使用
 
@@ -115,7 +112,7 @@ RW-HPS是AGPL v3授权的开放源码项目，完全免费使用。然而，如�
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/RW-HPS/RW-HPS.svg)](https://starchart.cc/RW-HPS/RW-HPS)
+[![Stargazers over time](https://starchart.cc/deng-rui/RW-HPS.svg)](https://starchart.cc/deng-rui/RW-HPS)
 
 ## 许可证
 
@@ -144,7 +141,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 <details>
-  <summary><a href="https://github.com/RW-HPS/RW-HPS/blob/master/Server/src/main/resources/eula/China.md">EULA</a></summary>
+  <summary><a href="https://github.com/deng-rui/RW-HPS/blob/master/Server/src/main/resources/eula/China.md">EULA</a></summary>
 
 ```
 版权所有©2022 RW-HPS.Team <RW-HPS@der.kim>

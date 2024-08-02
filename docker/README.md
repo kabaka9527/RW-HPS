@@ -1,14 +1,14 @@
 > 本镜像为方便管理 (后台运行+前台交互, 异常时自动重启), 已打包 `Supervisor`, 并将常用管理脚本打包
 
 > PS: Docker 镜像使用 `GitHub Actions` 自动更新, 可选版本号, 或选择最新开发版 (
-> tag: `{last_release}-beta`), [点击查看](https://github.com/RW-HPS/RW-HPS/pkgs/container/rw-hps)
+> tag: `{last_release}-beta`), [点击查看](https://github.com/deng-rui/RW-HPS/pkgs/container/rw-hps)
 
 ## Docker
 
 > 后台运行
 
 ```bash
-docker run --name rw-hps -d -p 5123:5123 -v ~/rw-hps-data:/app/data ghcr.io/rw-hps/rw-hps
+docker run --name rw-hps -d -p 5123:5123 -v ~/rw-hps-data:/app/data ghcr.io/deng-rui/RW-HPS
 ```
 
 > 进入容器内部
@@ -43,7 +43,7 @@ version: '3.4'
 
 services:
   rw-hps:
-    image: ghcr.io/rw-hps/rw-hps
+    image: ghcr.io/deng-rui/RW-HPS
     container_name: rw-hps
     ports:
       - "5123:5123"

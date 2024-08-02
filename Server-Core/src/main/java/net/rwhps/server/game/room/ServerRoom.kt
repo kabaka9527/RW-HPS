@@ -5,7 +5,7 @@
  *  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *  *
- *  * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ *  * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  *  
  */
 
@@ -48,6 +48,9 @@ class ServerRoom(
 
     var isStartGame = false
 
+    var sync = true
+    var banUnit = Seq<String>()
+
     // Start Time
     var startTime = 0
         private set
@@ -56,7 +59,7 @@ class ServerRoom(
         private set
 
     val isAfk get() = Data.configServer.isAfk
-    val muteAll get() = Data.configServer.muteAll
+    var muteAll = Data.configServer.muteAll
 
     var isMixPlayer = false
 
@@ -121,6 +124,8 @@ class ServerRoom(
 
         startTime = 0
         endTime = 0
+
+        banUnit.clear()
 
         forcedReturn = false
 

@@ -4,7 +4,7 @@
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
- * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  */
 
 package net.rwhps.server.plugin.internal.headless
@@ -12,8 +12,10 @@ package net.rwhps.server.plugin.internal.headless
 import net.rwhps.server.data.global.Data
 import net.rwhps.server.func.StrCons
 import net.rwhps.server.game.event.EventGlobalManage
+import net.rwhps.server.game.event.EventManage
 import net.rwhps.server.game.manage.HeadlessModuleManage
 import net.rwhps.server.plugin.Plugin
+import net.rwhps.server.plugin.internal.headless.service.event.GameHeadlessEvent
 import net.rwhps.server.plugin.internal.headless.service.event.GameHeadlessEventGlobal
 import net.rwhps.server.util.classload.GameModularReusableLoadClass
 import net.rwhps.server.util.game.GameStartInit
@@ -25,6 +27,7 @@ import java.util.*
  * @author Dr (dr@der.kim)
  */
 class HessMain: Plugin() {
+    override fun registerEvents(eventManage: EventManage) = eventManage.registerListener(GameHeadlessEvent())
     override fun registerGlobalEvents(eventManage: EventGlobalManage) = eventManage.registerListener(GameHeadlessEventGlobal())
 
     override fun registerCoreCommands(handler: CommandHandler) {

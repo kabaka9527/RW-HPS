@@ -4,7 +4,7 @@
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
- * https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE
+ * https://github.com/deng-rui/RW-HPS/blob/master/LICENSE
  */
 
 package net.rwhps.server.plugin.internal.headless
@@ -20,7 +20,7 @@ class README {
          * 此源代码的使用受 RW-HPS-Simulation 许可证的约束, 可以在以下链接找到该许可证.
          * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
          *
-         * https://github.com/RW-HPS/RW-HPS/tree/master/Server-Core/src/main/java/cn/rwhps/server/plugin/internal/hess/LICENSE
+         * https://github.com/deng-rui/RW-HPS/tree/master/Server-Core/src/main/java/cn/rwhps/server/plugin/internal/hess/LICENSE
          */
 
         RW-HPS Team 只供逆向并加以修改 , 使用请复制本文件

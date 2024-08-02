@@ -24,15 +24,15 @@ publishing {
 
             pom {
                 scm {
-                    url.set("https://github.com/RW-HPS/RW-HPS")
-                    connection.set("scm:https://github.com/RW-HPS/RW-HPS.git")
-                    developerConnection.set("scm:git@github.com:RW-HPS/RW-HPS.git")
+                    url.set("https://github.com/deng-rui/RW-HPS")
+                    connection.set("scm:https://github.com/deng-rui/RW-HPS.git")
+                    developerConnection.set("scm:git@github.com:deng-rui/RW-HPS.git")
                 }
 
                 licenses {
                     license {
                         name.set("GNU AGPLv3")
-                        url.set("https://github.com/RW-HPS/RW-HPS/blob/master/LICENSE")
+                        url.set("https://github.com/deng-rui/RW-HPS/blob/master/LICENSE")
                     }
                 }
 
@@ -49,7 +49,7 @@ publishing {
                 val root = asNode()
                 root.appendNode("description", project.description)
                 root.appendNode("name", project.name)
-                root.appendNode("url", "https://github.com/RW-HPS/RW-HPS")
+                root.appendNode("url", "https://github.com/deng-rui/RW-HPS")
             }
         }
     }

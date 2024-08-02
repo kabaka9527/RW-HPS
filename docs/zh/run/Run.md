@@ -23,7 +23,7 @@ sudo apt-get install openjdk-21-jdk -y #安装JDK21
 
 ## 下载编译好的服务端
 
-通过 [Release](https://github.com/RW-HPS/RW-HPS/releases) 下载
+通过 [Release](https://github.com/deng-rui/RW-HPS/releases) 下载
 
 ### Windows 运行方法
 
@@ -40,7 +40,7 @@ java -jar Server.jar
 ### Debian/Ubuntu运行方法
 - 1.通过 wget 下载最新版本的服务端
 ```bash
-wget https://github.com/RW-HPS/RW-HPS/releases/download/3.0.0-M5/Server-All.jar
+wget https://github.com/deng-rui/RW-HPS/releases/download/3.0.0-M5/Server-All.jar
 ```
 - 2.通过`mv Server_All.jar <目标文件夹>`移动服务端到你喜欢的文件夹里
 - 3.用和Windowss上一样的指令执行服务端：
@@ -122,12 +122,12 @@ sudo apt-get install git openjdk-21-jdk screen -y
 
 ```bash
 HTTPS  
-git clone https://github.com/RW-HPS/RW-HPS.git
+git clone https://github.com/deng-rui/RW-HPS.git
 ``` 
 
 ```bash  
 SSH
-git clone git@github.com:RW-HPS/RW-HPS.git  
+git clone git@github.com:deng-rui/RW-HPS.git  
 ```
 
 3.开始编译最新版本
