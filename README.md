@@ -31,11 +31,11 @@ _**Personal project, for learning only**_
 - Discussion:
   > The development team is actively answering questions on Github Discussions, please feel free to share you ideas about this project.  
   > Email contact: dr@der.kim      
-  > Tencent QQ Group: [901913920](https://qm.qq.com/cgi-bin/qm/qr?k=qhJ6ekYF9pD9jO6j8H2rZw8ePAVypoU0&jump_from=webapi)  
-  > <del>Telegram Group: [RW-HPS](https://t.me/RW_HPS) </del>  
-  > Discord: [RW-HPS](https://discord.gg/VwwxJhVG64)
+  > Tencent QQ Group: [980562548](https://qm.qq.com/cgi-bin/qm/qr?k=mxR_X-QsuLG6PeVaJspPqUOS_iWL02nx&jump_from=webapi&authKey=WSxLsF8GcHdYB3VIrOxNnprRSQBBlklBww6AF420KTmhcow3jYLQKEF3z3Qy+Vfx)  
+  > <del>Telegram Group: RW-HPS </del>  
+  > <del>Discord: RW-HPS </del>
 - Mirrors:
-  [Github](https://github.com/deng-rui/RW-HPS) ; [Gitee](https://gitee.com/derdct/RW-HPS)
+  [Github](https://github.com/deng-rui/RW-HPS)
 
 ### Used by whom
 

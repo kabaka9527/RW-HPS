@@ -52,11 +52,11 @@ _**个人项目, 仅供学习**_
 - 讨论:
   > 在 GitHub Discussions 提出的问题会收到回复, 也欢迎分享你基于项目的新想法  
   > 邮件联系: dr@der.kim  
-  > 腾讯QQ群: [901913920](https://qm.qq.com/cgi-bin/qm/qr?k=qhJ6ekYF9pD9jO6j8H2rZw8ePAVypoU0&jump_from=webapi)      
-  > <del>电报群: [RW-HPS](https://t.me/RW_HPS) </del>  
-  > Discord: [RW-HPS](https://discord.gg/VwwxJhVG64)
+  > 腾讯QQ群: [980562548](https://qm.qq.com/cgi-bin/qm/qr?k=mxR_X-QsuLG6PeVaJspPqUOS_iWL02nx&jump_from=webapi&authKey=WSxLsF8GcHdYB3VIrOxNnprRSQBBlklBww6AF420KTmhcow3jYLQKEF3z3Qy+Vfx)
+  > <del>电报群: RW-HPS </del>  
+  > <del>Discord: RW-HPS </del>
 - 镜像:
-  [Github](https://github.com/deng-rui/RW-HPS) ;  [Gitee](https://gitee.com/derdct/RW-HPS)
+  [Github](https://github.com/deng-rui/RW-HPS)
 
 ### 我们被谁使用
 
