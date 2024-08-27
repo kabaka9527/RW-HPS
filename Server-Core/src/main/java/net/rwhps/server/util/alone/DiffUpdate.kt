@@ -9,11 +9,6 @@
 
 package net.rwhps.server.util.alone
 
-import io.sigpipe.jbsdiff.Diff
-import io.sigpipe.jbsdiff.InvalidHeaderException
-import io.sigpipe.jbsdiff.Patch
-import org.apache.commons.compress.compressors.CompressorException
-import java.io.IOException
 import java.io.OutputStream
 
 /**
@@ -21,15 +16,6 @@ import java.io.OutputStream
  * @author Dr (dr@der.kim)
  */
 object DiffUpdate {
-    @JvmStatic
-    @Throws(CompressorException::class, InvalidHeaderException::class, IOException::class)
-    fun diff(oldBytes: ByteArray, newBytes: ByteArray, out: OutputStream) {
-        Diff.diff(oldBytes, newBytes, out)
-    }
-
-    @JvmStatic
-    @Throws(CompressorException::class, InvalidHeaderException::class, IOException::class)
-    fun patch(oldBytes: ByteArray, newBytes: ByteArray, out: OutputStream) {
-        Patch.patch(oldBytes, newBytes, out)
-    }
+    fun diff(oldBytes: ByteArray, newBytes: ByteArray, out: OutputStream) {}
+    fun patch(oldBytes: ByteArray, newBytes: ByteArray, out: OutputStream) {}
 }
