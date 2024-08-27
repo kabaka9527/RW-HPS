@@ -8,6 +8,7 @@
 ![](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRW-HPS%2FRW-HPS.svg?type=shield)
 
 [English version / 英文介绍](README.md) **or** [Chinese version / 中文介绍](README-CN.md)  
+
 **RW-HPS** 是一个 **Rusted Warfare** 游戏的服务端  
 用于在运行 Java21 的服务器上快速建立高性能游戏服务器  
 旨在作为一个高性能, 高可用的服务器 为玩家提供和官方服务器一样的游戏体验
@@ -35,35 +36,22 @@ _**个人项目, 仅供学习**_
 - 若修改 RW-HPS 源代码再发布，**或参考 RW-HPS 内部实现发布另一个项目**，则衍生项目必须在**文章首部**或 'RW-HPS' 相关内容**首次出现**的位置*
   *明确声明**来源于本仓库 (`https://github.com/deng-rui/RW-HPS`) 不得扭曲或隐藏免费且开源的事实。
 
-#### 目前待完成
-
-- [ ] WEB面板
-
 ### 不会支持的游戏协议
 
 - 金钱相关，如增值服务
 
 ## 开始
-
-- 用户手册: [docs](docs/zh/run/UserManual.md)
-- 开发文档: [docs](docs/zh/README.md)
-- 更新日志: [release](https://github.com/deng-rui/RW-HPS/releases)
-- 开发计划: [milestones](https://github.com/deng-rui/RW-HPS/milestones)
 - 讨论:
   > 在 GitHub Discussions 提出的问题会收到回复, 也欢迎分享你基于项目的新想法  
   > 邮件联系: dr@der.kim  
   > 腾讯QQ群: [980562548](https://qm.qq.com/cgi-bin/qm/qr?k=mxR_X-QsuLG6PeVaJspPqUOS_iWL02nx&jump_from=webapi&authKey=WSxLsF8GcHdYB3VIrOxNnprRSQBBlklBww6AF420KTmhcow3jYLQKEF3z3Qy+Vfx)
-  > <del>电报群: RW-HPS </del>  
-  > <del>Discord: RW-HPS </del>
-- 镜像:
-  [Github](https://github.com/deng-rui/RW-HPS)
 
 ### 我们被谁使用
 
 - Tiexiu.xyz
     - [简幻欢](https://sfe.simpfun.cn)
 - 非官方RELAY
-    - **RelayCN-Unofficial IP** - [SimpFun Cloud](https://cloud.simpfun.cn) : relay.der.kim
+    - **RelayCN-Unofficial IP** - [SimpFun Cloud](https://cloud.simpfun.cn) : relaya.der.kim
     - **RelayRU-Unofficial IP** - `Vulkan (RMT)`: vulkan.host
 
 ## 运行配置
@@ -84,13 +72,7 @@ _**个人项目, 仅供学习**_
 | 测试环境 	        | i7-13700HX          | 32G  | Windows      | 2T SSD | Java 21 (Azul JDK)    |
 
 ## 版本合集
-
-游戏对应最终服务端版本合集
-
-|    游戏版本     |      RW-HPS版本      |  我要飞飞  |
-|:-----------:|:------------------:|:------:|
-|  ~~1.15~~   | DEV | BEAT |
-| ~~1.14~~ |     ~~6.0.0-M3（beta）~~      | Delete |
+不提供, 自行编译
 
 ## 赞助
 
@@ -144,7 +126,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <summary><a href="https://github.com/deng-rui/RW-HPS/blob/master/Server/src/main/resources/eula/China.md">EULA</a></summary>
 
 ```
-版权所有©2022 RW-HPS.Team <RW-HPS@der.kim>
+版权所有©2022 Dr <RW-HPS@der.kim>
 
 允许在其遵守CC BY-NC-SA 4.0协议的同时，每个人复制和分发此许可证文档的逐字记录副本，且允许对其进行更改，但必须保留其版权信息与原作者。
 

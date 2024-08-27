@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 RW-HPS Team and contributors.
+ * Copyright 2020-2024 Dr (dr@der.kim) and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -64,7 +64,7 @@ dependencies {
 
     compileOnlyAndTest("org.graalvm.js:js:${Versions.graalvmVersion}")
     compileOnlyAndTest("org.graalvm.sdk:graal-sdk:${Versions.graalvmVersion}")
-    testImplementation(fileTree(mapOf("dir" to "libs", "include" to "wasm.jar")))
+    implementation(fileTree(mapOf("dir" to "libs", "include" to "wasm.jar")))
 
     testApi("org.junit.jupiter:junit-jupiter-engine:5.10.1")
 }

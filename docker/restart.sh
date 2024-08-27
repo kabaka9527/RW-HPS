@@ -1,1 +1,0 @@
-supervisorctl restart rw-hps

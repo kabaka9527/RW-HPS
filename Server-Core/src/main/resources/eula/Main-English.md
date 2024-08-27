@@ -1,6 +1,6 @@
 ### RW-HPS End User License Agreement
 
-### Modified © 2023 RW-HPS.Team <RW-HPS@der.kim>
+### Modified © 2023 Dr <RW-HPS@der.kim>
 
 ### Copyright © 2022 James Clef <qwq233@qwq2333.top, qwq2333.top>
 

@@ -15,10 +15,6 @@ Provide players with the same gaming experience as the official server
 _**Personal project, for learning only**_
 </div>
 
-#### Currently to be completed
-
-- [ ] GamePanel
-
 ### Actions that won't be supported
 
 - Anything related to real money
@@ -34,8 +30,6 @@ _**Personal project, for learning only**_
   > Tencent QQ Group: [980562548](https://qm.qq.com/cgi-bin/qm/qr?k=mxR_X-QsuLG6PeVaJspPqUOS_iWL02nx&jump_from=webapi&authKey=WSxLsF8GcHdYB3VIrOxNnprRSQBBlklBww6AF420KTmhcow3jYLQKEF3z3Qy+Vfx)  
   > <del>Telegram Group: RW-HPS </del>  
   > <del>Discord: RW-HPS </del>
-- Mirrors:
-  [Github](https://github.com/deng-rui/RW-HPS)
 
 ### Used by whom
 
@@ -63,13 +57,7 @@ _**Personal project, for learning only**_
 | Test Environment 	        | i7-13700HX          | 32G  | Windows      | 2T SSD | Java 21 (Azul JDK)    |
 
 ## version collection
-
-The game corresponds to the final server version collection
-
-| Game Version |   RW-HPS version   | State |
-|:------------:|:------------------:|:-------------:|
-|     1.15     |      DEV      |     BETA      |
-|   ~~1.14~~   | ~~6.0.0-M3（beta）~~ |    Delete     |
+Not provided, compile by yourself
 
 ## Sponsorship
 
@@ -137,7 +125,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <summary><a href="https://github.com/deng-rui/RW-HPS/blob/master/Server/src/main/resources/eula/China.md">EULA</a></summary>
 
 ```
-版权所有©2022 RW-HPS.Team <RW-HPS@der.kim>
+版权所有©2022 Dr <RW-HPS@der.kim>
 
 允许在其遵守CC BY-NC-SA 4.0协议的同时，每个人复制和分发此许可证文档的逐字记录副本，且允许对其进行更改，但必须保留其版权信息与原作者。
 

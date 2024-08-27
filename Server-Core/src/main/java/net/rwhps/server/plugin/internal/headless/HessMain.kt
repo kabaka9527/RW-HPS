@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 RW-HPS Team and contributors.
+ * Copyright 2020-2024 Dr (dr@der.kim) and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -48,15 +48,7 @@ class HessMain: Plugin() {
             HeadlessModuleManage.hpsLoader = load.toString()
             GameStartInit.start(load)
 
-//             load = GameModularReusableLoadClass(
-//                    Thread.currentThread().contextClassLoader, Thread.currentThread().contextClassLoader.parent
-//            )
-//            GameStartInit.init(load)
-//            Log.clog(Data.i18NBundle.getinput("server.load.headless"))
-//            // 设置 RW-HPS 主要使用的 Hess
-//            HeadlessModuleManage.hpsLoader = load.toString()
-//            GameStartInit.start(load)
-
+            README().readme
             Log.set(Data.config.log.uppercase(Locale.getDefault()))
         }
     }

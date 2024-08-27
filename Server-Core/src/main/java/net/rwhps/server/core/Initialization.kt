@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 RW-HPS Team and contributors.
+ * Copyright 2020-2024 Dr (dr@der.kim) and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -248,13 +248,6 @@ class Initialization {
             FileUtils.getInternalFileStream("/maven/ASM-Framework/implementation.txt").readFileListString().eachAll(libImport)
             FileUtils.getInternalFileStream("/maven/Server-Core/implementation.txt").readFileListString().eachAll(libImport)
             FileUtils.getInternalFileStream("/maven/TimeTaskQuartz/implementation.txt").readFileListString().eachAll(libImport)
-
-            val wasm = FileUtils.getFolder(Data.ServerLibPath).toFile("Wasm.jar")
-            if (!wasm.exists() && !DownloadManage.addDownloadTask(DownloadManage.DownloadData(Data.urlData.readString("Get.Core.ResDown") + "Wasm.zip", wasm, progressFlag = true))) {
-                Log.fatal("WASM Down Error")
-                return
-            }
-            libraryManager.customImportLib(wasm)
 
             libraryManager.loadToClassLoader()
 

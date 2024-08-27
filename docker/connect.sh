@@ -1,1 +1,0 @@
-supervisorctl fg rw-hps
