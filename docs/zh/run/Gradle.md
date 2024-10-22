@@ -22,7 +22,7 @@ Gradle是一个基于Apache Ant和Apache Maven概念的项目自动化建构工�
    在命令行输入
 
 ```bash
-./gwadlew jar
+./gradlew jar
 ```
 
 等待完毕即可
