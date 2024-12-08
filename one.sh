@@ -106,30 +106,36 @@ install_zulu_jdk() {
     construct_zulu_url
     echo "正在下载 Zulu JDK 21..."
     wget -O zulu-jdk21.tar.gz "$ZULU_URL"
+    if [ $? -ne 0 ]; then
+        echo "Zulu JDK 21 下载失败，请手动下载并安装。"
+        exit 1
+    fi
     echo "下载完成。"
 
     # 创建目录
     sudo mkdir -p /opt/RW-HPS_JDK
     # 解压 JDK 到指定目录
-    sudo tar -vxf zulu-jdk21.tar.gz -C /opt/RW-HPS_JDK
+    sudo tar -vxf zulu-jdk21.tar.gz -C /opt/RW-HPS_JDK --strip-components=1
     # 创建符号链接
     sudo ln -s /opt/RW-HPS_JDK/bin/java /usr/bin/hpsjdk
     # 添加到环境变量
-  
+    echo 'export PATH=$PATH:/opt/RW-HPS_JDK/bin' | sudo tee /etc/profile.d/rw-hps_jdk.sh
+    source /etc/profile.d/rw-hps_jdk.sh
+
+    # 检查 Java 版本
+    check_java_version
+}
+
+# 检查 Java 版本
 check_java_version() {
-    java_version_output=$(java -version 2>&1)
+    java_version_output=$(hpsjdk -version 2>&1)
     if [[ $java_version_output =~ "21" ]]; then
-        echo "Java21或更高版本已安装，继续执行脚本。"
+        echo "Java 21或更高版本已安装，继续执行脚本。"
         return 0
     else
         echo "Java 版本不符合要求，请反馈或检查"
         exit 1
     fi
-}
-
-# 执行Java版本检查
-check_java_version
-  
 }
 
 # 卸载 Zulu JDK 21
@@ -139,6 +145,7 @@ uninstall_zulu_jdk() {
     # 删除JDK目录
     sudo rm -rf /opt/RW-HPS_JDK
     # 删除环境变量文件
+    sudo rm -f /etc/profile.d/rw-hps_jdk.sh
     echo "Zulu JDK 21 卸载完成。"
 }
 
