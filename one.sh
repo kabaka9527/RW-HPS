@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/bash
 
 # 脚本标题
 echo "RW-HPS Linux 脚本"
@@ -10,16 +9,16 @@ relyon="wget sudo tar curl jq "
 install_commands() {
     case "$OS" in
         "ubuntu"|"debian")
-            echo "sudo apt-get install $relyon -y"
+            sudo apt-get install $relyon -y || { echo "请手动安装以下依赖: $relyon"; exit 1; }
             ;;
         "centos"|"fedora")
-            echo "sudo yum install $relyon -y"
+            sudo yum install $relyon -y || { echo "请手动安装以下依赖: $relyon"; exit 1; }
             ;;
         "arch")
-            echo "sudo pacman -S $relyon"
+            sudo pacman -S $relyon || { echo "请手动安装以下依赖: $relyon"; exit 1; }
             ;;
         "alpine")
-            echo "sudo apk add $relyon -y"
+            sudo apk add $relyon -y || { echo "请手动安装以下依赖: $relyon"; exit 1; }
             ;;
         *)
             echo "Error: Unsupported operating system."
