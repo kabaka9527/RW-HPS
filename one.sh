@@ -9,16 +9,28 @@ relyon="wget sudo tar curl jq "
 install_commands() {
     case "$OS" in
         "ubuntu"|"debian")
-            sudo apt-get install $relyon -y || { echo "请手动安装以下依赖: $relyon"; exit 1; }
+            until sudo apt-get install $relyon -y; do
+                echo "安装失败，重试中..."
+                sleep 2
+            done
             ;;
         "centos"|"fedora")
-            sudo yum install $relyon -y || { echo "请手动安装以下依赖: $relyon"; exit 1; }
+            until sudo yum install $relyon -y; do
+                echo "安装失败，重试中..."
+                sleep 2
+            done
             ;;
         "arch")
-            sudo pacman -S $relyon || { echo "请手动安装以下依赖: $relyon"; exit 1; }
+            until sudo pacman -S $relyon; do
+                echo "安装失败，重试中..."
+                sleep 2
+            done
             ;;
         "alpine")
-            sudo apk add $relyon -y || { echo "请手动安装以下依赖: $relyon"; exit 1; }
+            until sudo apk add $relyon -y; do
+                echo "安装失败，重试中..."
+                sleep 2
+            done
             ;;
         *)
             echo "Error: Unsupported operating system."
