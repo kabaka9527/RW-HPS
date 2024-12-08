@@ -16,7 +16,7 @@ install_commands() {
             echo "sudo yum install $relyon -y"
             ;;
         "arch")
-            echo "sudo pacman -S $relyon -y"
+            echo "sudo pacman -S $relyon"
             ;;
         "alpine")
             echo "sudo apk add $relyon -y"
@@ -30,7 +30,12 @@ install_commands() {
 
 # 获取当前系统的名称
 get_os_name() {
-    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        OS=$ID
+    else
+        OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+    fi
 }
 
 # 安装 wget 和 unzip
